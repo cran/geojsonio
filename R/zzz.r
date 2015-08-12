@@ -256,7 +256,7 @@ spdftogeolist <- function(x){
   }
 }
 
-write_geojson <- function(input, file = "myfile.geojson", ...){
+write_geojson <- function(input, file = "myfile.geojson", precision = NULL, ...){
   if (!grepl("\\.geojson$", file)) {
     file <- paste0(file, ".geojson")
   }
@@ -264,22 +264,28 @@ write_geojson <- function(input, file = "myfile.geojson", ...){
   unlink(file)
   destpath <- dirname(file)
   if (!file.exists(destpath)) dir.create(destpath)
-  write_ogr(input, tempfile(), file, ...)
+  write_ogr(input, tempfile(), file, precision, ...)
 }
 
-write_ogr <- function(input, dir, file, ...){
+write_ogr <- function(input, dir, file, precision = NULL, ...){
   input@data <- convert_ordered(input@data)
-  writeOGR(input, dir, "", "GeoJSON", ...)
+  dots <- list(...)
+  if (!is.null(precision)) {
+    ## add precision to vector of layer_options in '...'
+    dots$layer_options <- c(dots$layer_options, paste0("COORDINATE_PRECISION=", precision))
+  }
+  args <- c(list(obj = input, dsn = dir, layer = "", driver = "GeoJSON"), dots)
+  do.call(writeOGR, args)
   file.copy(dir, file)
   message("Success! File is at ", file)
 }
 
 convert_ordered <- function(df) {
-  data.frame(lapply(df, function(x) {
-    if ("ordered" %in% class(x)) x <- as.character(x)
+  df[] <- lapply(df, function(x) {
+    if (is(x, "ordered")) x <- as.character(x)
     x
-  }),
-  stringsAsFactors = FALSE)
+  })
+  return(df)
 }
 
 #' Pipe operator

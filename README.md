@@ -4,7 +4,9 @@ geojsonio
 
 
 [![Build Status](https://api.travis-ci.org/ropensci/geojsonio.png)](https://travis-ci.org/ropensci/geojsonio)
-[![Coverage Status](https://coveralls.io/repos/ropensci/geojsonio/badge.svg)](https://coveralls.io/r/ropensci/geojsonio)
+[![codecov.io](https://codecov.io/github/ropensci/geojsonio/coverage.svg?branch=master)](https://codecov.io/github/ropensci/geojsonio?branch=master)
+[![rstudio mirror downloads](http://cranlogs.r-pkg.org/badges/geojsonio)](https://github.com/metacran/cranlogs.app)
+[![cran version](http://www.r-pkg.org/badges/version/geojsonio)](http://cran.rstudio.com/web/packages/geojsonio)
 
 __Convert various data formats to geoJSON or topoJSON__
 
@@ -12,9 +14,9 @@ This package is a utility to convert geographic data to geojson and topojson for
 
 Functions in this package are organized first around what you're working with or want to get, geojson or topojson, then convert to or read from various formats:
 
-* `geojson_list()`/`topojson_list()` - convert to geojson/topojson as R list format
-* `geojson_json()`/`topojson_json()` - convert to geojson/topojson as json
-* `geojson_read()``topojson_read()` - read a geojson/topojson file from file path or URL
+* `geojson_list()` - convert to geojson as R list format
+* `geojson_json()` - convert to geojson as json
+* `geojson_read()`/`topojson_read()` - read a geojson/topojson file from file path or URL
 * `geojson_write()` - write a geojson file locally (topojson coming later)
 
 Each of the above functions have methods for various objects/classes, including `numeric`, `data.frame`, `list`, `SpatialPolygons`, `SpatialLines`, `SpatialPoints`, etc.
@@ -29,9 +31,8 @@ Additional functions:
 * [GeoJSON lint](http://geojsonlint.com/)
 * TopoJSON - [spec](https://github.com/topojson/topojson-specification/blob/master/README.md)
 
-## Quick start
 
-### Install
+## Install
 
 A note about installing `rgdal` and `rgeos` - these two packages are built on top of C libraries, and their installation often causes trouble for Mac and Linux users because no binaries are provided on CRAN for those platforms. Other dependencies in `geojsonio` should install easily automatically when you install `geojsonio`. Change to the version of `rgdal` and `GDAL` you have):
 
@@ -69,6 +70,15 @@ install.packages("rgeos", type = "source")
 
 __Install geojsonio__
 
+Stable version from CRAN
+
+
+```r
+install.packages("geojsonio")
+```
+
+Or development version from GitHub
+
 
 ```r
 install.packages("devtools")
@@ -80,9 +90,9 @@ devtools::install_github("ropensci/geojsonio")
 library("geojsonio")
 ```
 
-### GeoJSON
+## GeoJSON
 
-#### Convert various formats to geojson
+### Convert various formats to geojson
 
 From a `numeric` vector of length 2, as json or list
 
@@ -172,7 +182,7 @@ geojson_list(sp_poly)$features[[1]]
 ...
 ```
 
-#### Combine objects
+### Combine objects
 
 `geo_list` + `geo_list`
 
@@ -209,17 +219,19 @@ c + d
 #> {"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"Point","coordinates":[-99.74,32.45]},"properties":{}},{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[100,0],[101,0],[101,1],[100,1],[100,0]]]},"properties":[]}]}
 ```
 
-#### Write geojson
+### Write geojson
 
 
 ```r
 library('maps')
 data(us.cities)
 geojson_write(us.cities[1:2, ], lat = 'lat', lon = 'long')
-#> [1] "myfile.geojson"
+#> <geojson>
+#>   Path:       myfile.geojson
+#>   From class: data.frame
 ```
 
-#### Read geojson
+### Read geojson
 
 
 ```r
@@ -227,28 +239,60 @@ file <- system.file("examples", "california.geojson", package = "geojsonio")
 out <- geojson_read(file)
 ```
 
-### TopoJSON
+## TopoJSON
 
-#### Read topojson
+### Read topojson
 
 TopoJSON
 
 
 ```r
+library("sp")
 url <- "https://raw.githubusercontent.com/shawnbot/d3-cartogram/master/data/us-states.topojson"
-out <- topojson_read(url)
-#> OGR data source with driver: GeoJSON 
-#> Source: "https://raw.githubusercontent.com/shawnbot/d3-cartogram/master/data/us-states.topojson", layer: "states"
-#> with 51 features
-#> It has 2 fields
+out <- topojson_read(url, verbose = FALSE)
 plot(out)
 ```
 
-![plot of chunk unnamed-chunk-17](inst/img/unnamed-chunk-17-1.png) 
+![plot of chunk unnamed-chunk-18](inst/img/unnamed-chunk-18-1.png) 
+
+## Use case: Play with US states
+
+Using data from [https://github.com/glynnbird/usstatesgeojson](https://github.com/glynnbird/usstatesgeojson)
+
+Get some geojson
+
+
+```r
+library('httr')
+res <- GET('https://api.github.com/repos/glynnbird/usstatesgeojson/contents')
+st_names <- Filter(function(x) grepl("\\.geojson", x), sapply(content(res), "[[", "name"))
+base <- 'https://raw.githubusercontent.com/glynnbird/usstatesgeojson/master/'
+st_files <- paste0(base, st_names)
+```
+
+Make a faceted plot
+
+
+```r
+library('ggplot2')
+library('plyr')
+st_use <- st_files[7:13]
+geo <- lapply(st_use, geojson_read, method = "local", what = "sp", verbose = FALSE)
+#> Error in rgdal::readOGR(input, rgdal::ogrListLayers(input), verbose = FALSE, : formal argument "verbose" matched by multiple actual arguments
+df <- ldply(setNames(lapply(geo, fortify), gsub("\\.geojson", "", st_names[7:13])))
+#> Error in lapply(geo, fortify): object 'geo' not found
+ggplot(df, aes(long, lat, group = group)) +
+  geom_polygon() +
+  facet_wrap(~.id, scales = "free")
+#> Error: ggplot2 doesn't know how to deal with data of class function
+```
+
+Okay, so the maps are not quite right (stretched to fit each panel), but you get the idea.
+
 
 ## Meta
 
-* [Please report any issues or bugs](https://github.com/ropensci/geojsonio/issues).
+* Please [report any issues or bugs](https://github.com/ropensci/geojsonio/issues).
 * License: MIT
 * Get citation information for `geojsonio` in R doing `citation(package = 'geojsonio')`
 

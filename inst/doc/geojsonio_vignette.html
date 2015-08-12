@@ -3,7 +3,19 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
-<title>gistr vignette</title>
+<title>geojsonio vignette</title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
 
 <!-- Styles for R syntax highlighter -->
 <style type="text/css">
@@ -45,9 +57,6 @@ var hljs=new function(){function m(p){return p.replace(/&/gm,"&amp;").replace(/<
 hljs.initHighlightingOnLoad();
 </script>
 
-<!-- MathJax scripts -->
-<script type="text/javascript" src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-</script>
 
 
 <style type="text/css">
@@ -60,6 +69,7 @@ body, td {
 body {
   max-width: 800px;
   margin: auto;
+  padding: 1em;
   line-height: 20px;
 }
 
@@ -67,28 +77,28 @@ tt, code, pre {
    font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
 }
 
-h1 { 
-   font-size:2.2em; 
+h1 {
+   font-size:2.2em;
 }
 
-h2 { 
-   font-size:1.8em; 
+h2 {
+   font-size:1.8em;
 }
 
-h3 { 
-   font-size:1.4em; 
+h3 {
+   font-size:1.4em;
 }
 
-h4 { 
-   font-size:1.0em; 
+h4 {
+   font-size:1.0em;
 }
 
-h5 { 
-   font-size:0.9em; 
+h5 {
+   font-size:0.9em;
 }
 
-h6 { 
-   font-size:0.8em; 
+h6 {
+   font-size:0.8em;
 }
 
 a:visited {
@@ -98,7 +108,9 @@ a:visited {
 pre, img {
   max-width: 100%;
 }
-
+pre {
+  overflow-x: auto;
+}
 pre code {
    display: block; padding: 0.5em;
 }
@@ -132,54 +144,54 @@ hr {
 }
 
 @media print {
-   * { 
-      background: transparent !important; 
-      color: black !important; 
-      filter:none !important; 
-      -ms-filter: none !important; 
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
    }
 
-   body { 
-      font-size:12pt; 
-      max-width:100%; 
-   }
-       
-   a, a:visited { 
-      text-decoration: underline; 
+   body {
+      font-size:12pt;
+      max-width:100%;
    }
 
-   hr { 
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
       visibility: hidden;
       page-break-before: always;
    }
 
-   pre, blockquote { 
-      padding-right: 1em; 
-      page-break-inside: avoid; 
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
    }
 
-   tr, img { 
-      page-break-inside: avoid; 
+   tr, img {
+      page-break-inside: avoid;
    }
 
-   img { 
-      max-width: 100% !important; 
+   img {
+      max-width: 100% !important;
    }
 
-   @page :left { 
-      margin: 15mm 20mm 15mm 10mm; 
-   }
-     
-   @page :right { 
-      margin: 15mm 10mm 15mm 20mm; 
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
    }
 
-   p, h2, h3 { 
-      orphans: 3; widows: 3; 
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
    }
 
-   h2, h3 { 
-      page-break-after: avoid; 
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
    }
 }
 </style>
@@ -192,18 +204,19 @@ hr {
 <!--
 %\VignetteEngine{knitr::knitr}
 %\VignetteIndexEntry{geojsonio vignette}
+%\VignetteEncoding{UTF-8}
 -->
 
-<h1>gistr vignette</h1>
+<h1>geojsonio vignette</h1>
 
 <p><code>geojsonio</code> converts geographic data to geojson and topojson formats. Nothing else. We hope to do this one job very well, and handle all reasonable use cases.</p>
 
 <p>Functions in this package are organized first around what you&#39;re working with or want to get, geojson or topojson, then convert to or read from various formats:</p>
 
 <ul>
-<li><code>geojson_list()</code>/<code>topojson_list()</code> - convert to geojson/topojson as R list format</li>
-<li><code>geojson_json()</code>/<code>topojson_json()</code> - convert to geojson/topojson as json</li>
-<li><code>geojson_read()</code><code>topojson_read()</code> - read a geojson/topojson file from file path or URL</li>
+<li><code>geojson_list()</code> - convert to geojson as R list format</li>
+<li><code>geojson_json()</code> - convert to geojson as json</li>
+<li><code>geojson_read()</code>/<code>topojson_read()</code> - read a geojson/topojson file from file path or URL</li>
 <li><code>geojson_write()</code> - write a geojson file locally (no write topojson yet)</li>
 </ul>
 
@@ -212,40 +225,16 @@ hr {
 <p>Additional functions:</p>
 
 <ul>
-<li><code>map_gist()</code> - push up a geojson or topojson file as a GitHub gist (renders as an interactive map)</li>
+<li><code>map_gist()</code> - push up a geojson or topojson file as a GitHub gist (renders as an interactive map) - See the <em>maps with geojsonio</em> vignette.</li>
+<li><code>map_leaf()</code> - create a local interactive map with the <code>leaflet</code> package - See the <em>maps with geojsonio</em> vignette. </li>
 </ul>
 
 <h2>Install</h2>
 
-<p>A note about installing <code>rgdal</code> and <code>rgeos</code> - these two packages are built on top of C libraries, and their installation often causes trouble for Mac and Linux users because no binaries are provided on CRAN for those platforms. Other dependencies in <code>geojsonio</code> should install easily automatically when you install <code>geojsonio</code>. Change to the version of <code>rgdal</code> and <code>GDAL</code> you have):</p>
+<p>Install rgdal - in case you can&#39;t get it installed from binary , here&#39;s what works on a Mac (change to the version of <code>rgdal</code> and <code>GDAL</code> you have).</p>
 
-<p><em>Mac</em></p>
-
-<p>Install <code>GDAL</code> on the command line first, e.g., usingn <code>homebrew</code></p>
-
-<pre><code>brew install gdal
+<pre><code class="r">install.packages(&quot;http://cran.r-project.org/src/contrib/rgdal_0.9-1.tar.gz&quot;, repos = NULL, type=&quot;source&quot;, configure.args = &quot;--with-gdal-config=/Library/Frameworks/GDAL.framework/Versions/1.11/unix/bin/gdal-config --with-proj-include=/Library/Frameworks/PROJ.framework/unix/include --with-proj-lib=/Library/Frameworks/PROJ.framework/unix/lib&quot;)
 </code></pre>
-
-<p>Then install <code>rgdal</code> and <code>rgeos</code></p>
-
-<pre><code class="r">install.packages(&quot;rgdal&quot;, type = &quot;source&quot;, configure.args = &quot;--with-gdal-config=/Library/Frameworks/GDAL.framework/Versions/1.11/unix/bin/gdal-config --with-proj-include=/Library/Frameworks/PROJ.framework/unix/include --with-proj-lib=/Library/Frameworks/PROJ.framework/unix/lib&quot;)
-install.packages(&quot;rgeos&quot;, type = &quot;source&quot;)
-</code></pre>
-
-<p><em>Linux</em></p>
-
-<p>Get deps first</p>
-
-<pre><code>sudo apt-get install libgdal1-dev libgdal-dev libgeos-c1 libproj-dev
-</code></pre>
-
-<p>Then install <code>rgdal</code> and <code>rgeos</code></p>
-
-<pre><code class="r">install.packages(&quot;rgdal&quot;, type = &quot;source&quot;)
-install.packages(&quot;rgeos&quot;, type = &quot;source&quot;)
-</code></pre>
-
-<p><strong>Install geojsonio</strong></p>
 
 <p>Stable version from CRAN</p>
 
@@ -292,13 +281,15 @@ install.packages(&quot;rgeos&quot;, type = &quot;source&quot;)
 
 <p>as <strong>json</strong></p>
 
-<pre><code class="r">geojson_json(us_cities[1:2, ], lat = &#39;lat&#39;, lon = &#39;long&#39;)
+<pre><code class="r">library(&#39;maps&#39;)
+data(us.cities)
+geojson_json(us.cities[1:2, ], lat = &#39;lat&#39;, lon = &#39;long&#39;)
 #&gt; {&quot;type&quot;:&quot;FeatureCollection&quot;,&quot;features&quot;:[{&quot;type&quot;:&quot;Feature&quot;,&quot;geometry&quot;:{&quot;type&quot;:&quot;Point&quot;,&quot;coordinates&quot;:[-99.74,32.45]},&quot;properties&quot;:{&quot;name&quot;:&quot;Abilene TX&quot;,&quot;country.etc&quot;:&quot;TX&quot;,&quot;pop&quot;:&quot;113888&quot;,&quot;capital&quot;:&quot;0&quot;}},{&quot;type&quot;:&quot;Feature&quot;,&quot;geometry&quot;:{&quot;type&quot;:&quot;Point&quot;,&quot;coordinates&quot;:[-81.52,41.08]},&quot;properties&quot;:{&quot;name&quot;:&quot;Akron OH&quot;,&quot;country.etc&quot;:&quot;OH&quot;,&quot;pop&quot;:&quot;206634&quot;,&quot;capital&quot;:&quot;0&quot;}}]}
 </code></pre>
 
 <p>as a <strong>list</strong></p>
 
-<pre><code class="r">geojson_list(us_cities[1:2, ], lat = &#39;lat&#39;, lon = &#39;long&#39;)
+<pre><code class="r">geojson_list(us.cities[1:2, ], lat = &#39;lat&#39;, lon = &#39;long&#39;)
 #&gt; $type
 #&gt; [1] &quot;FeatureCollection&quot;
 #&gt; 
@@ -315,10 +306,10 @@ install.packages(&quot;rgeos&quot;, type = &quot;source&quot;)
 <p>From <code>SpatialPolygons</code> class</p>
 
 <pre><code class="r">library(&#39;sp&#39;)
-poly1 &lt;- Polygons(list(Polygon(cbind(c(-100, -90, -85, -100),
-  c(40, 50, 45, 40)))), &quot;1&quot;)
-poly2 &lt;- Polygons(list(Polygon(cbind(c(-90, -80, -75, -90),
-  c(30, 40, 35, 30)))), &quot;2&quot;)
+poly1 &lt;- Polygons(list(Polygon(cbind(c(-100,-90,-85,-100),
+  c(40,50,45,40)))), &quot;1&quot;)
+poly2 &lt;- Polygons(list(Polygon(cbind(c(-90,-80,-75,-90),
+  c(30,40,35,30)))), &quot;2&quot;)
 sp_poly &lt;- SpatialPolygons(list(poly1, poly2), 1:2)
 </code></pre>
 
@@ -373,78 +364,67 @@ s &lt;- SpatialPoints(cbind(x, y))
 ...
 </code></pre>
 
-<h3>Combine objects</h3>
-
-<p><code>geo_list</code> + <code>geo_list</code></p>
-
-<blockquote>
-<p>Note: <code>geo_list</code> is the output type from <code>geojson_list()</code>, it&#39;s just a list with a class attached so we know it&#39;s geojson :)</p>
-</blockquote>
-
-<pre><code class="r">vec &lt;- c(-99.74, 32.45)
-a &lt;- geojson_list(vec)
-vecs &lt;- list(c(100.0, 0.0), c(101.0, 0.0), c(100.0, 0.0))
-b &lt;- geojson_list(vecs, geometry = &quot;polygon&quot;)
-a + b
-#&gt; $type
-#&gt; [1] &quot;FeatureCollection&quot;
-#&gt; 
-#&gt; $features
-#&gt; $features[[1]]
-#&gt; $features[[1]]$type
-#&gt; [1] &quot;Feature&quot;
-#&gt; 
-#&gt; $features[[1]]$geometry
-#&gt; $features[[1]]$geometry$type
-...
-</code></pre>
-
-<p><code>json</code> + <code>json</code></p>
-
-<pre><code class="r">c &lt;- geojson_json(c(-99.74, 32.45))
-vecs &lt;- list(c(100.0, 0.0), c(101.0, 0.0), c(101.0, 1.0), c(100.0, 1.0), c(100.0, 0.0))
-d &lt;- geojson_json(vecs, geometry = &quot;polygon&quot;)
-c + d
-#&gt; {&quot;type&quot;:&quot;FeatureCollection&quot;,&quot;features&quot;:[{&quot;type&quot;:&quot;Feature&quot;,&quot;geometry&quot;:{&quot;type&quot;:&quot;Point&quot;,&quot;coordinates&quot;:[-99.74,32.45]},&quot;properties&quot;:{}},{&quot;type&quot;:&quot;Feature&quot;,&quot;geometry&quot;:{&quot;type&quot;:&quot;Polygon&quot;,&quot;coordinates&quot;:[[[100,0],[101,0],[101,1],[100,1],[100,0]]]},&quot;properties&quot;:[]}]}
-</code></pre>
-
 <h3>Write geojson</h3>
 
-<pre><code class="r">geojson_write(us_cities[1:2, ], lat = &#39;lat&#39;, lon = &#39;long&#39;)
+<pre><code class="r">library(&#39;maps&#39;)
+data(us.cities)
+geojson_write(us.cities[1:2, ], lat = &#39;lat&#39;, lon = &#39;long&#39;)
 #&gt; &lt;geojson&gt;
 #&gt;   Path:       myfile.geojson
 #&gt;   From class: data.frame
 </code></pre>
 
+<h3>Read geojson</h3>
+
+<pre><code class="r">library(&quot;sp&quot;)
+file &lt;- system.file(&quot;examples&quot;, &quot;california.geojson&quot;, package = &quot;geojsonio&quot;)
+out &lt;- geojson_read(file, what = &quot;sp&quot;)
+plot(out)
+</code></pre>
+
+<p><img src="data:image/png;base64,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i0XvzVetWlX69OnD2Ab2NSERI5BpATrZZZqKFVUgR44cMmXKFOnRo4dUrFiR4WstOyyKFSsmI0eOlB07dkj//v1FBzBiQQABNwU4g3ezXWOSVYsWLUzv7O+//17Kly8fk32yk8gI6JWY0aNHmzkGHnroIdovMqxsBYFACXAGH6jmsCuYmTNnihaHChUqSGJiol3Bex6tXonRTpPnn3++NGnSRFasWOG5COkj4J4AZ/DutWnMM3r77bfl22+/lTFjxphL+DEPgB1mS2DSpEny4osvmnvzOnMgCwIIuCFAgXejHeOexYABA2TdunUybty4uMdCAOELLF26VPr16yddu3aVCy64IPwN8AkEEAicAAU+cE1iZ0D6CFblypVl9erVTEpjZxOaWej69u0rdevWNY/TWZoGYSOAwP8EuAfPoRARAZ1pTjttaZHfu3dvRLbJRmIrUKZMGTPinT7++OCDDzKvfGz52RsCERfgDD7ipH5vcMiQIWa60jvvvJPR7iw9FA4dOmQ6T27dulUefvhhM1WwpakQNgJeC3AG73XzRz55nb1s4sSJMnbsWNFCwWKfgE5Uo+PW165d2wxtyxMS9rUhESOgAhR4joOIChQqVEimT58uOr2sdrz78ccfhfmMIkocs41169ZNLr30UjOo0fLly2O2X3aEAAKREeASfWQc2UoqAu+8847oTGbFixc3E53o3PIs9gnMmjVLHn30Ubn77ruFx+jsaz8i9leAAu9v28cs8zfffFM+//xzGTVqlOhQqSz2CSxbtkwGDRokXbp0MZPV2JcBESPgnwCX6P1r85hnfPXVV5tJaZimNOb0EdthrVq15Omnn5a33npLXn311Yhtlw0hgED0BCjw0bNlyykEdJS7Bg0ayJdffpniVX60SaBcuXLmMbq5c+eaAY3oRGlT6xGrjwIUeB9bPU456/Skr732Gp3u4uQfid3q9MBPPfWUmSpY55b/559/IrFZtoEAAlEQoMBHAZVNpi6gl3m1QOiwqCz2CiQkJJiBcHRwo169esmWLVvsTYbIEXBYgALvcOMGLTU929Me2TfeeKMZ0jZo8RFPeAK33367tGnTxjwrr0MVsyCAQLAEKPDBag+nowk9Jqfzx1988cWyadMmp/P1IblOnTrJTTfdJDrA0S+//OJDyuSIgDUCFHhrmsqNQBcuXGjuwV9yySVSunRpN5LyPAt9OkIfoRs8eLCZNthzDtJHIDACFPjANIVfgYSeh+cs3o12b9iwoYwYMUJGjhwpH374oRtJkQUClgtQ4C1vQFvDr1Onjpl3XEe5Y3FDoFq1avLMM8+YAv/888+7kRRZIGCxAAXe4sazOfRmzZqZ2eZWrlyZrTQY5z5bfBH/sN520SK/aNEiMxPdwYMHI74PNogAApkToMBnzom1IiyQP39+ueGGG+SNN97I8pZ//fVXM+vZtm3bsrwNPhh5gYIFC5rL9fv27ZP+/fvLnj17Ir8TtogAAhkKUOAzJGKFaAls3rxZqlatGvbmJ0yYIC+++KLpva2P3ukfCh988EHY2+ED0RPIkyePmWCocuXK0rNnT9G55VkQQCC2AhT42HqztxQCM2fOlCZNmqR4JeMfddKTyy67TPRRu9GjR8vw4cPlySefFB0l7+uvv854A6wRM4EcOXKYgXC0l/2tt94q69ati9m+2RECCDAfPMdAnAR+//132blzp5x00klhRaCj4XXo0EEee+wxqV+/vvlslSpVzLS0+vqqVavC2h4rR1/gyiuvlOuvv150YBy9rcKCAAKxEch1f/ISm12xFwT+E9DL7Dp5yb///is5c+aUfPnySa5cuf5bIY2f9CxdzwQvv/zyI9bQIXD1kbvVq1dLy5Ytj3iPX+IvcOKJJ4oObav/3OjP2vYsCCAQXQHmg4+uL1tPRUBnITv33HNlypQpcu2118r+/fvlwIED0r17d2nbtm0qn/jvJT1z117aOqNZiRIl5J577hF95E5nqdPC/9577wmP3v3nFbSflixZYtrstttuy7CtgxY78SBgmwAF3rYWcyDeLl26HJ5TPPSYmz4upxOX6NzxOvxpWouuf/fdd8uwYcNEe89rMdfXnn32WfPHQmg43LQ+z+vxF9CrLP369ZMrrrjC9KeIf0REgICbAhR4N9s10FmtX79e9FGq3LlzS8qCrI9V1ahRQ1544QU555xzUs3h559/llNOOcWcvYdmMVu8eLHUrl1btFMXix0Cejulb9++0qJFC7nlllvsCJooEbBMgF70ljWYC+GWL19eihQpckRx17zy5s0rY8eONZfv58yZk2qquo4uP/30k/k+ZswYc4me4m44rPlPqVKlRNtO/2DTqzGhKznWJECgCFggQIG3oJF8CrFVq1YyY8YMadq0qblc37hxY/nj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" alt="plot of chunk unnamed-chunk-17"/> </p>
+
 <h2>Topojson</h2>
 
-<p>In the current version of this package you can read topojson. Writing topojson was in this package, but is gone for now - will come back later as in interface to <a href="https://github.com/mbostock/topojson">topojson</a> via <a href="https://github.com/jeroenooms/V8">V8</a>.</p>
+<p>In the current version of this package you can read topojson. Writing topojson was in this package, but is gone for now - will come back later as in interface to <a href="https://github.com/mbostock/topojson">topojson</a> via <a href="https://github.com/jeroenooms/V8">V8</a>. </p>
 
 <p>Read from a file</p>
 
 <pre><code class="r">file &lt;- system.file(&quot;examples&quot;, &quot;us_states.topojson&quot;, package = &quot;geojsonio&quot;)
-out &lt;- geojson_read(file)
+out &lt;- topojson_read(file, verbose = FALSE)
+summary(out)
+#&gt; Object of class SpatialPolygonsDataFrame
+#&gt; Coordinates:
+#&gt;          min       max
+#&gt; x -171.79111 -66.96466
+#&gt; y   18.91619  71.35776
+#&gt; Is projected: NA 
+#&gt; proj4string : [NA]
+#&gt; Data attributes:
+#&gt;           id       name   
+#&gt;  Alabama   : 1   NA&#39;s:51  
+#&gt;  Alaska    : 1            
+#&gt;  Arizona   : 1            
+#&gt;  Arkansas  : 1            
+#&gt;  California: 1            
+#&gt;  Colorado  : 1            
+#&gt;  (Other)   :45
 </code></pre>
 
 <p>Read from a URL</p>
 
 <pre><code class="r">url &lt;- &quot;https://raw.githubusercontent.com/shawnbot/d3-cartogram/master/data/us-states.topojson&quot;
-out &lt;- topojson_read(url)
+out &lt;- topojson_read(url, verbose = FALSE)
 </code></pre>
 
 <p>Or use <code>as.location()</code> first</p>
 
 <pre><code class="r">(loc &lt;- as.location(file))
-out &lt;- topojson_read(loc)
+#&gt; &lt;location&gt; 
+#&gt;    Type:  file 
+#&gt;    Location:  /Library/Frameworks/R.framework/Versions/3.2/Resources/library/geojsonio/examples/us_states.topojson
+out &lt;- topojson_read(loc, verbose = FALSE)
 </code></pre>
-
-<h2>To do</h2>
-
-<ul>
-<li>Replace <code>rgdal</code> with javascript libraries to read from various file types (kml, shp, etc.) and convert to geojson. This is in development, and will come in the next version of this package most likely. </li>
-<li>Performance improvements. Some operations already use the gdal or geos C libraries, so are quite fast, though the round trip to disk and back does take significant time. </li>
-<li>More input types. We already have operations (json, list, etc.) for lots of input types (data.frame, list, sp classes). but likely there will be more added. </li>
-</ul>
 
 </body>
 
