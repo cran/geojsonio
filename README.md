@@ -16,6 +16,7 @@ Functions in this package are organized first around what you're working with or
 
 * `geojson_list()` - convert to geojson as R list format
 * `geojson_json()` - convert to geojson as json
+* `geojson_sp()` - convert output of `geojson_list()` or `geojson_json()` to spatial objects
 * `geojson_read()`/`topojson_read()` - read a geojson/topojson file from file path or URL
 * `geojson_write()` - write a geojson file locally (topojson coming later)
 
@@ -24,6 +25,7 @@ Each of the above functions have methods for various objects/classes, including 
 Additional functions:
 
 * `map_gist()` - push up a geojson or topojson file as a GitHub gist (renders as an interactive map)
+* `map_leaf()` - create a local interactive map using the `leaflet` package
 
 ## *json Info
 
@@ -253,7 +255,7 @@ out <- topojson_read(url, verbose = FALSE)
 plot(out)
 ```
 
-![plot of chunk unnamed-chunk-18](inst/img/unnamed-chunk-18-1.png) 
+![plot of chunk unnamed-chunk-18](inst/img/unnamed-chunk-18-1.png)
 
 ## Use case: Play with US states
 
@@ -277,15 +279,14 @@ Make a faceted plot
 library('ggplot2')
 library('plyr')
 st_use <- st_files[7:13]
-geo <- lapply(st_use, geojson_read, method = "local", what = "sp", verbose = FALSE)
-#> Error in rgdal::readOGR(input, rgdal::ogrListLayers(input), verbose = FALSE, : formal argument "verbose" matched by multiple actual arguments
+geo <- lapply(st_use, geojson_read, method = "local", what = "sp")
 df <- ldply(setNames(lapply(geo, fortify), gsub("\\.geojson", "", st_names[7:13])))
-#> Error in lapply(geo, fortify): object 'geo' not found
 ggplot(df, aes(long, lat, group = group)) +
   geom_polygon() +
   facet_wrap(~.id, scales = "free")
-#> Error: ggplot2 doesn't know how to deal with data of class function
 ```
+
+![plot of chunk unnamed-chunk-20](inst/img/unnamed-chunk-20-1.png)
 
 Okay, so the maps are not quite right (stretched to fit each panel), but you get the idea.
 
@@ -295,5 +296,6 @@ Okay, so the maps are not quite right (stretched to fit each panel), but you get
 * Please [report any issues or bugs](https://github.com/ropensci/geojsonio/issues).
 * License: MIT
 * Get citation information for `geojsonio` in R doing `citation(package = 'geojsonio')`
+* Please note that this project is released with a [Contributor Code of Conduct](CONDUCT.md). By participating in this project you agree to abide by its terms.
 
 [![rofooter](http://ropensci.org/public_images/github_footer.png)](http://ropensci.org)

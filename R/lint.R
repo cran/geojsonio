@@ -46,6 +46,11 @@
 #' # From numeric
 #' vec <- c(32.45,-99.74)
 #' lint(vec)
+#' 
+#' # From a list
+#' mylist <- list(list(latitude=30, longitude=120, marker="red"),
+#'                list(latitude=30, longitude=130, marker="blue"))
+#' lint(mylist)
 #' }
 lint <- function(x, ...) {
   UseMethod("lint")
@@ -53,7 +58,7 @@ lint <- function(x, ...) {
 
 #' @export
 lint.character <- function(x, ...) {
-  if( !jsonlite::validate(x) ) stop("invalid json string")
+  if ( !jsonlite::validate(x) ) stop("invalid json string")
   lintit(x)
 }
 
@@ -72,7 +77,8 @@ lint.location <- function(x, ...){
 
 #' @export
 lint.list <- function(x, ...) {
-  lintit(toJSON(x, auto_unbox = TRUE))
+  # lintit(toJSON(x, auto_unbox = TRUE))
+  lint(geojson_list(x, ...))
 }
 
 #' @export
@@ -112,9 +118,10 @@ lint.data.frame <- function(x, ...) lint(geojson_list(x, ...))
 
 # helper fxn
 lintit <- function(x) {
-  ct$eval(sprintf("var out = geojsonhint.hint('%s');", minify(x)))
+  ct$assign("x", minify(x))
+  ct$eval("var out = geojsonhint.hint(x);")
   tmp <- as.list(ct$get("out"))
-  if(identical(tmp, list())){
+  if (identical(tmp, list())) {
     return("valid")
   } else {
     tmp

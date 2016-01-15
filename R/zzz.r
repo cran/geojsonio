@@ -1,7 +1,9 @@
 tg_compact <- function(l) Filter(Negate(is.null), l)
 
-# to_json <- function(x, ...) structure(jsonlite::toJSON(x, ..., auto_unbox = TRUE), class=c('json','geo_json'))
-to_json <- function(x, ...) structure(jsonlite::toJSON(x, ..., digits = 22, auto_unbox = TRUE), class = 'json')
+to_json <- function(x, ...) {
+  structure(jsonlite::toJSON(x, ..., digits = 22, auto_unbox = TRUE), 
+            class = c('json','geo_json'))
+}
 
 list_to_geo_list <- function(x, lat, lon, geometry = "point", type = "FeatureCollection", unnamed = FALSE, group=NULL){
   nn <- switch(type, FeatureCollection = "features", GeometryCollection = "geometries")
@@ -244,9 +246,12 @@ splinestogeolist <- function(x, object){
 
 spdftogeolist <- function(x){
   if (is(x, "SpatialPointsDataFrame") || is(x, "SpatialGridDataFrame")) {
-    nms <- dimnames(coordinates(x))[[2]]
+    #nms <- dimnames(x)[[2]]
+    nms <- suppressMessages(guess_latlon(names(data.frame(x))))
     temp <- apply(data.frame(x), 1, as.list)
-    list_to_geo_list(temp, nms[1], nms[2], NULL, type = "FeatureCollection")
+    list_to_geo_list(temp, nms$lat, nms$lon, NULL, type = "FeatureCollection")
+  } else if (is(x, "SpatialPolygonsDataFrame")) {
+    geojson_list(x)
   } else {
     list(type = "MultiPoint",
          bbox = bbox2df(x@bbox),
@@ -261,7 +266,6 @@ write_geojson <- function(input, file = "myfile.geojson", precision = NULL, ...)
     file <- paste0(file, ".geojson")
   }
   file <- path.expand(file)
-  unlink(file)
   destpath <- dirname(file)
   if (!file.exists(destpath)) dir.create(destpath)
   write_ogr(input, tempfile(), file, precision, ...)
@@ -287,16 +291,6 @@ convert_ordered <- function(df) {
   })
   return(df)
 }
-
-#' Pipe operator
-#'
-#' @name %>%
-#' @rdname pipe
-#' @keywords internal
-#' @export
-#' @importFrom magrittr %>%
-#' @usage lhs \%>\% rhs
-NULL
 
 geojson_rw <- function(input, ...){
   if (is(input, "SpatialCollections")) {
