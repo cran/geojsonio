@@ -5,6 +5,9 @@
 #'
 #' @param x Input, a geojson character string or list
 #' @param ... Further args passed on to helper functions.
+#' 
+#' @details This function is Deprecated - and will be removed in the next version of 
+#' this package. See \code{\link{geojsonio-deprecated}} for more information
 #'
 #' @examples \dontrun{
 #' lint('{"type": "FooBar"}')
@@ -77,7 +80,6 @@ lint.location <- function(x, ...){
 
 #' @export
 lint.list <- function(x, ...) {
-  # lintit(toJSON(x, auto_unbox = TRUE))
   lint(geojson_list(x, ...))
 }
 
@@ -118,6 +120,7 @@ lint.data.frame <- function(x, ...) lint(geojson_list(x, ...))
 
 # helper fxn
 lintit <- function(x) {
+  .Deprecated("geojson_hint", package = "geojsonlint", msg = "This function will be removed in the next version, see geojsonlint::geojson_hint()")
   ct$assign("x", minify(x))
   ct$eval("var out = geojsonhint.hint(x);")
   tmp <- as.list(ct$get("out"))
@@ -127,78 +130,3 @@ lintit <- function(x) {
     tmp
   }
 }
-
-# Examples -------------------------------
-
-# # from lincoln
-# x <- '{"type":"Point","geometry":{"type":"Point","coordinates":[-80,40]},"properties":{}}'
-#
-# # bad
-# x <- '{
-# "type": "Point",
-# "coordinates": [2, 2],
-# "bbox": [1, 2, "string"]
-# }'
-#
-# # bad, fails on minify() call i think cause bad json
-# x <- '{
-# "type": "MultiPoint"
-# "coordinates": [["foo", "bar"]]
-# }'
-#
-# # bad
-# x <- '{
-# "type": "FooBar"
-# }'
-#
-# # bad
-# x <- '{ "type": "FeatureCollection" }'
-#
-# # bad
-# x <- '{
-# "type": "Point",
-# "coordinates": [2]
-# }'
-#
-# # good
-# x <- '{
-# "type": "Feature",
-# "id": 100,
-# "geometry": {"type": "Point", "coordinates": [102.0, 0.5]},
-# "properties": {"prop0": "value0"}
-# }'
-#
-# # good
-# x <- '{ "type": "FeatureCollection",
-# "features": [
-# { "type": "Feature",
-# "geometry": {"type": "Point", "coordinates": [102.0, 0.5]},
-# "properties": {"prop0": "value0"}
-# },
-# { "type": "Feature",
-# "geometry": {
-# "type": "LineString",
-# "coordinates": [
-# [102.0, 0.0], [103.0, 1.0], [104.0, 0.0], [105.0, 1.0]
-# ]
-# },
-# "properties": {
-# "prop0": "value0",
-# "prop1": 0.0
-# }
-# },
-# { "type": "Feature",
-# "geometry": {
-# "type": "Polygon",
-# "coordinates": [
-# [ [100.0, 0.0], [101.0, 0.0], [101.0, 1.0],
-# [100.0, 1.0], [100.0, 0.0] ]
-# ]
-# },
-# "properties": {
-# "prop0": "value0",
-# "prop1": {"this": "that"}
-# }
-# }
-# ]
-# }'

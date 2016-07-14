@@ -5,6 +5,10 @@ to_json <- function(x, ...) {
             class = c('json','geo_json'))
 }
 
+class_json <- function(x, ...) {
+  structure(x, class = c('json','geo_json'))
+}
+
 list_to_geo_list <- function(x, lat, lon, geometry = "point", type = "FeatureCollection", unnamed = FALSE, group=NULL){
   nn <- switch(type, FeatureCollection = "features", GeometryCollection = "geometries")
   geom <- capwords(match.arg(geometry, c("point", "polygon")))
@@ -296,17 +300,30 @@ convert_ordered <- function(df) {
   return(df)
 }
 
-geojson_rw <- function(input, ...){
-  if (is(input, "SpatialCollections")) {
+geojson_rw <- function(input, target = c("char", "list"), ...){
+
+  read_fun <- switch(target, 
+                     char = geojson_file_to_char, 
+                     list = geojson_file_to_list)
+  
+  if (inherits(input, "SpatialCollections")) {
     tmp <- tempfile(fileext = ".geojson")
     tmp2 <- suppressMessages(geojson_write(input, file = tmp))
     paths <- vapply(tg_compact(tmp2), "[[", "", "path")
-    lapply(paths, jsonlite::fromJSON, simplifyDataFrame = FALSE, simplifyMatrix = FALSE, ...)
+    lapply(paths, read_fun, ...)
   } else {
     tmp <- tempfile(fileext = ".geojson")
     suppressMessages(geojson_write(input, file = tmp))
-    jsonlite::fromJSON(tmp, simplifyDataFrame = FALSE, simplifyMatrix = FALSE, ...)
+    read_fun(tmp, ...)
   }
+}
+
+geojson_file_to_char <- function(file, ...) {
+  readr::read_file(file, locale = readr::locale())
+}
+
+geojson_file_to_list <- function(file, ...) {
+  jsonlite::fromJSON(file, simplifyDataFrame = FALSE, simplifyMatrix = FALSE, ...)
 }
 
 capwords <- function(s, strict = FALSE, onlyfirst = FALSE) {

@@ -5,7 +5,7 @@ test_that("lint works with character inputs", {
   expect_is(a, "list")
   expect_is(a$message, "character")
   expect_equal(a$message, "The type FooBar is unknown")
-
+  
   # valid
   expect_equal(lint('{"type": "Point", "coordinates": [-80,40]}'), "valid")
   
