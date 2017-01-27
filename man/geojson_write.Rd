@@ -6,10 +6,10 @@
 \usage{
 geojson_write(input, lat = NULL, lon = NULL, geometry = "point",
   group = NULL, file = "myfile.geojson", overwrite = TRUE,
-  precision = NULL, ...)
+  precision = NULL, convert_wgs84 = FALSE, crs = NULL, ...)
 }
 \arguments{
-\item{input}{Input list, data.frame, or spatial class. Inputs can also be
+\item{input}{Input list, data.frame, spatial class, or sf class. Inputs can also be
 dplyr \code{tbl_df} class since it inherits from \code{data.frame}.}
 
 \item{lat}{(character) Latitude name. The default is \code{NULL}, and we
@@ -35,6 +35,10 @@ the file already exists, we stop with error message.}
 geojson file. Using fewer decimal places can decrease file sizes (at the
 cost of precision).}
 
+\item{convert_wgs84}{Should the input be converted to the \href{https://tools.ietf.org/html/rfc7946}{standard coordinate referece system defined for GeoJSON} (geographic coordinate reference system, using the WGS84 datum, with longitude and latitude unitsof decimal degrees; EPSG: 4326). Default is \code{FALSE} though this may change in a future package version. This will only work for \code{sf} or \code{Spatial} objects with a CRS already defined. If one is not defined but you know what it is, you may define it in the \code{crs} argument below.}
+
+\item{crs}{The CRS of the input if it is not already defined. This can be an epsg code as a four or five digit integer or a valid proj4 string. This argument will be ignored if \code{convert_wgs84} is \code{FALSE} or the object already has a CRS.}
+
 \item{...}{Further args passed on to \code{\link[rgdal]{writeOGR}}}
 }
 \description{
@@ -48,7 +52,8 @@ geojson_write(us_cities[1:2,], lat='lat', lon='long')
 
 ## to polygons
 head(states)
-geojson_write(input=states, lat='lat', lon='long', geometry='group', group="group")
+geojson_write(input=states, lat='lat', lon='long', 
+  geometry='polygon', group="group")
 
 ## partial states dataset to points (defaults to points)
 geojson_write(input=states, lat='lat', lon='long')
@@ -148,6 +153,13 @@ poly <- SpatialPolygons(list(poly1, poly2), 1:2)
 coordinates(us_cities) <- ~long+lat
 dat <- SpatialCollections(points = us_cities, polygons = poly)
 geojson_write(dat)
+}
+
+# From sf classes:
+if (require(sf)) {
+  file <- system.file("examples", "feature_collection.geojson", package = "geojsonio")
+  sf_fc <- st_read(file, quiet = TRUE)
+  geojson_write(sf_fc)
 }
 }
 \seealso{

@@ -5,28 +5,13 @@
 #'
 #' @export
 #' @param input The file being uploaded, path to the file on your machine.
-#' @param method One of web or local. Matches on partial strings.
-#' @param output Destination for output geojson file. Defaults to current working 
-#' directory
-#' @param parse (logical) To parse geojson to data.frame like structures if possible.
-#' Default: \code{FALSE}
-#' @param encoding (character) The encoding passed to \code{\link[rgdal]{readOGR}}. 
-#' Default: CP1250
+#' @param output Destination for output geojson file. Defaults to current 
+#' working directory, and gives a random alphanumeric file name
+#' @param encoding (character) The encoding passed to 
+#' \code{\link[rgdal]{readOGR}}.  Default: CP1250
 #' @param verbose (logical) Printing of \code{\link[rgdal]{readOGR}} progress. 
 #' Default: \code{FALSE}
-#' @param ... Additional parameters passed to \code{\link[rgdal]{readOGR}}
-#' @description
-#' The web option uses the Ogre web API. Ogre currently has an output size limit of 15MB.
-#' See here \url{http://ogre.adc4gis.com/} for info on the Ogre web API.
-#' The local option uses the function \code{\link{writeOGR}} from the package rgdal.
-#'
-#' Note that for Shapefiles, GML, MapInfo, and VRT, you need to send zip files
-#' to Ogre. For other file types (.bna, .csv, .dgn, .dxf, .gxt, .txt, .json,
-#' .geojson, .rss, .georss, .xml, .gmt, .kml, .kmz) you send the actual file with
-#' that file extension.
-#'
-#' If you're having trouble rendering geoJSON files, ensure you have a valid
-#' geoJSON file by running it through a geoJSON linter \url{http://geojsonlint.com/}.
+#' @template read
 #' @examples \dontrun{
 #' file <- system.file("examples", "norway_maple.kml", package = "geojsonio")
 #'
@@ -55,22 +40,47 @@
 #' ## beware, this is a long running example
 #' # url <- 'http://www.nws.noaa.gov/geodata/catalog/national/data/ci08au12.zip'
 #' # out <- file_to_geojson(input=url, method='web', output='cities')
+#' 
+#' # geojson with .json extension
+#' x <- gsub("\n", "", paste0('https://gist.githubusercontent.com/hunterowens/
+#' 25ea24e198c80c9fbcc7/raw/7fd3efda9009f902b5a991a506cea52db19ba143/
+#' wards2014.json', collapse = ""))
+#' res <- file_to_geojson(x)
+#' jsonlite::fromJSON(res)
+#' res <- file_to_geojson(x, method = "local")
+#' jsonlite::fromJSON(res)
 #' }
 
 file_to_geojson <- function(input, method = "web", output = ".", parse = FALSE, 
                             encoding = "CP1250", verbose = FALSE, ...) {
   
   method <- match.arg(method, choices = c("web", "local"))
-  if (!is(parse, "logical")) stop("parse must be logical", call. = FALSE)
+  if (!inherits(parse, "logical")) stop("parse must be logical", call. = FALSE)
+  
+  input <- handle_remote(input)
+  mem <- ifelse(output == ":memory:", TRUE, FALSE)
+  
   if (method == "web") {
     url <- "http://ogre.adc4gis.com/convert"
-    input <- handle_remote(input)
     tt <- httr::POST(url, body = list(upload = httr::upload_file(input)))
-    httr::stop_for_status(tt)
+    if (tt$status_code > 201) {
+      res <- tryCatch(
+        httr::content(tt, as = "text", encoding = "UTF-8"), 
+        error = function(e) e
+      )
+      if (inherits(res, "error")) httr::stop_for_status(tt)
+      res2 <- tryCatch(
+        jsonlite::fromJSON(res), 
+        error = function(e) e
+      )
+      if (inherits(res2, "error")) httr::stop_for_status(tt)
+      stop(paste0(res2[[1]], collapse = "\n"), call. = FALSE)
+    }
     out <- httr::content(tt, as = "text", encoding = "UTF-8")
-    if (output == ":memory:") {
+    if (mem) {
       jsonlite::fromJSON(out, parse)
     } else {
+      if (output == ".") output <- basename(tempfile())
       fileConn <- file(paste0(output, ".geojson"))
       writeLines(out, fileConn)
       close(fileConn)
@@ -79,8 +89,13 @@ file_to_geojson <- function(input, method = "web", output = ".", parse = FALSE,
     }
   } else {
     fileext <- ftype(input)
-    mem <- ifelse(output == ":memory:", TRUE, FALSE)
-    output <- ifelse(output == ":memory:", tempfile(), output)
+    output <- if (output == ":memory:") {
+      tempfile()
+    } else if (output == ".") {
+      basename(tempfile())
+    } else {
+      output
+    }
     output <- path.expand(output)
     if (fileext == "kml") {
       my_layer <- rgdal::ogrListLayers(input)
@@ -96,7 +111,6 @@ file_to_geojson <- function(input, method = "web", output = ".", parse = FALSE,
         file_ret(output)
       }
     } else if (fileext == "shp") {
-      # x <- readShapeSpatial(input)
       x <- rgdal::readOGR(input, rgdal::ogrListLayers(input),
                           verbose = FALSE, stringsAsFactors = FALSE, 
                           encoding = encoding, ...)
@@ -107,11 +121,12 @@ file_to_geojson <- function(input, method = "web", output = ".", parse = FALSE,
         file_at(output)
         file_ret(output)
       }
-    } else if (fileext == "url") {
+    } else if (fileext %in% c("geojson", "json")) {
       unlink(paste0(output, ".geojson"))
       x <- rgdal::readOGR(input, rgdal::ogrListLayers(input), 
                           verbose = FALSE, stringsAsFactors = FALSE, 
                           encoding = encoding, ...)
+      
       write_ogr2(x, output)
       if (mem) {
         from_json(output, parse)
@@ -146,21 +161,18 @@ from_json <- function(x, parse) {
 
 ftype <- function(z) {
   if (is.url(z)) {
-    "url"
-  } else {
-    fileext <- strsplit(z, "\\.")[[1]]
-    fileext[length(fileext)]
+    z <- httr::parse_url(z)$path
   }
+  fileext <- strsplit(z, "\\.")[[1]]
+  fileext[length(fileext)]
 }
 
 # If given a url for a zip file, download it give back a path to the temporary file
 handle_remote <- function(x){
-  if (!grepl('http://', x)) {
+  if (!is.url(x)) {
     return(x)
   } else {
-    tfile <- tempfile(fileext = ".zip")
-    # download.file(x, destfile = tfile)
-    # tfile
+    tfile <- tempfile(fileext = paste0(".", ftype(x)))
     res <- httr::GET(x, httr::write_disk(tfile))
     httr::stop_for_status(res)
     res$request$output$path

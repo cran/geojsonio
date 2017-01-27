@@ -3,17 +3,16 @@
 #' @export
 #'
 #' @param x (character) Path to a local file or a URL.
-#' @param method (character) One of "web" (default) or "local". Matches on partial strings.
-#' @param parse (logical) To parse geojson to data.frame like structures if possible. 
-#' Default: \code{FALSE}
-#' @param what (character) What to return. One of "list" or "sp" (for Spatial class). 
-#' Default: "list". If "sp" chosen, forced to \code{method="local"}. 
-#' @param ... Additional parameters passed to \code{\link[rgdal]{readOGR}}
+#' @param what (character) What to return. One of "list" or "sp" (for 
+#' Spatial class). Default: "list". If "sp" chosen, forced to 
+#' \code{method="local"}. 
+#' @template read
+#' 
 #' @details Uses \code{\link{file_to_geojson}} internally to give back geojson, 
 #' and other helper functions when returning spatial classes.
 #' 
-#' This function supports various geospatial file formats from a URL, as well as local
-#' kml, shp, and geojson file formats.
+#' This function supports various geospatial file formats from a URL, as well 
+#' as local kml, shp, and geojson file formats.
 #'
 #' @examples \dontrun{
 #' # From a file
@@ -47,8 +46,16 @@
 #' shpfile <- list.files(dir, pattern = ".shp", full.names = TRUE)
 #' geojson_read(shpfile, what = "sp")
 #' 
+#' x <- "https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json"
+#' geojson_read(x, method = "local", what = "sp")
+#' geojson_read(x, method = "local", what = "list")
+#' 
+#' utils::download.file(x, destfile = basename(x))
+#' geojson_read(basename(x), method = "local", what = "sp")
+#' 
 #' # doesn't work right now
-#' ## file <- system.file("examples", "feature_collection.geojson", package = "geojsonio")
+#' ## file <- system.file("examples", "feature_collection.geojson", 
+#' ##   package = "geojsonio")
 #' ## geojson_read(file, what = "sp")
 #' }
 geojson_read <- function(x, method = "web", parse = FALSE, what = "list", ...) {
@@ -73,18 +80,16 @@ read_json <- function(x, method, parse, what, ...) {
   )
 }
 
-file_to_sp <- function(input, output = ".", ...) {
+file_to_sp <- function(input, ...) {
   fileext <- ftype(input)
-  fileext <- match.arg(fileext, c("shp", "kml", "url", "geojson"))
-  mem <- ifelse(output == ":memory:", TRUE, FALSE)
-  output <- ifelse(output == ":memory:", tempfile(), output)
-  output <- path.expand(output)
-  switch(fileext, 
-      kml = rgdal::readOGR(input, rgdal::ogrListLayers(input)[1], 
-                       drop_unsupported_fields = TRUE, verbose = FALSE, ...),
-      # shp = maptools::readShapeSpatial(input),
-      shp = rgdal::readOGR(input, rgdal::ogrListLayers(input), verbose = FALSE, ...),
-      url = rgdal::readOGR(input, rgdal::ogrListLayers(input), verbose = FALSE, ...),
-      geojson = rgdal::readOGR(input, rgdal::ogrListLayers(input), verbose = FALSE, ...)
+  fileext <- match.arg(fileext, c("shp", "kml", "geojson", "json"))
+  input <- handle_remote(input)
+  switch(
+    fileext, 
+    kml = rgdal::readOGR(input, rgdal::ogrListLayers(input)[1], 
+                         drop_unsupported_fields = TRUE, verbose = FALSE, ...),
+    shp = rgdal::readOGR(input, rgdal::ogrListLayers(input), verbose = FALSE, ...),
+    geojson = rgdal::readOGR(input, rgdal::ogrListLayers(input), verbose = FALSE, ...),
+    json = rgdal::readOGR(input, rgdal::ogrListLayers(input), verbose = FALSE, ...)
   )
 }
