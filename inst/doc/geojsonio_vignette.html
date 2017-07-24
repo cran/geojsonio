@@ -319,10 +319,9 @@ sp_poly &lt;- SpatialPolygons(list(poly1, poly2), 1:2)
 <pre><code class="r">geojson_json(sp_poly)
 #&gt; {
 #&gt; &quot;type&quot;: &quot;FeatureCollection&quot;,
-#&gt;                                                                                 
 #&gt; &quot;features&quot;: [
-#&gt; { &quot;type&quot;: &quot;Feature&quot;, &quot;id&quot;: 1, &quot;properties&quot;: { &quot;dummy&quot;: 0.000000 }, &quot;geometry&quot;: { &quot;type&quot;: &quot;Polygon&quot;, &quot;coordinates&quot;: [ [ [ -100.0, 40.0 ], [ -90.0, 50.0 ], [ -85.0, 45.0 ], [ -100.0, 40.0 ] ] ] } },
-#&gt; { &quot;type&quot;: &quot;Feature&quot;, &quot;id&quot;: 2, &quot;properties&quot;: { &quot;dummy&quot;: 0.000000 }, &quot;geometry&quot;: { &quot;type&quot;: &quot;Polygon&quot;, &quot;coordinates&quot;: [ [ [ -90.0, 30.0 ], [ -80.0, 40.0 ], [ -75.0, 35.0 ], [ -90.0, 30.0 ] ] ] } }
+#&gt; { &quot;type&quot;: &quot;Feature&quot;, &quot;id&quot;: 1, &quot;properties&quot;: { &quot;dummy&quot;: 0.0 }, &quot;geometry&quot;: { &quot;type&quot;: &quot;Polygon&quot;, &quot;coordinates&quot;: [ [ [ -100.0, 40.0 ], [ -90.0, 50.0 ], [ -85.0, 45.0 ], [ -100.0, 40.0 ] ] ] } },
+#&gt; { &quot;type&quot;: &quot;Feature&quot;, &quot;id&quot;: 2, &quot;properties&quot;: { &quot;dummy&quot;: 0.0 }, &quot;geometry&quot;: { &quot;type&quot;: &quot;Polygon&quot;, &quot;coordinates&quot;: [ [ [ -90.0, 30.0 ], [ -80.0, 40.0 ], [ -75.0, 35.0 ], [ -90.0, 30.0 ] ] ] } }
 #&gt; ]
 #&gt; }
 #&gt; 
@@ -356,7 +355,6 @@ s &lt;- SpatialPoints(cbind(x, y))
 <pre><code class="r">geojson_json(s)
 #&gt; {
 #&gt; &quot;type&quot;: &quot;FeatureCollection&quot;,
-#&gt;                                                                                 
 #&gt; &quot;features&quot;: [
 #&gt; { &quot;type&quot;: &quot;Feature&quot;, &quot;id&quot;: 1, &quot;properties&quot;: { &quot;dat&quot;: 1 }, &quot;geometry&quot;: { &quot;type&quot;: &quot;Point&quot;, &quot;coordinates&quot;: [ 1.0, 3.0 ] } },
 #&gt; { &quot;type&quot;: &quot;Feature&quot;, &quot;id&quot;: 2, &quot;properties&quot;: { &quot;dat&quot;: 2 }, &quot;geometry&quot;: { &quot;type&quot;: &quot;Point&quot;, &quot;coordinates&quot;: [ 2.0, 2.0 ] } },
@@ -421,13 +419,13 @@ summary(out)
 #&gt; Is projected: NA 
 #&gt; proj4string : [NA]
 #&gt; Data attributes:
-#&gt;           id       name   
-#&gt;  Alabama   : 1   NA&#39;s:51  
-#&gt;  Alaska    : 1            
-#&gt;  Arizona   : 1            
-#&gt;  Arkansas  : 1            
-#&gt;  California: 1            
-#&gt;  Colorado  : 1            
+#&gt;           id    
+#&gt;  Alabama   : 1  
+#&gt;  Alaska    : 1  
+#&gt;  Arizona   : 1  
+#&gt;  Arkansas  : 1  
+#&gt;  California: 1  
+#&gt;  Colorado  : 1  
 #&gt;  (Other)   :45
 </code></pre>
 
@@ -442,7 +440,7 @@ out &lt;- topojson_read(url, verbose = FALSE)
 <pre><code class="r">(loc &lt;- as.location(file))
 #&gt; &lt;location&gt; 
 #&gt;    Type:  file 
-#&gt;    Location:  /Library/Frameworks/R.framework/Versions/3.3/Resources/library/geojsonio/examples/us_states.topojson
+#&gt;    Location:  /Library/Frameworks/R.framework/Versions/3.4/Resources/library/geojsonio/examples/us_states.topojson
 out &lt;- topojson_read(loc, verbose = FALSE)
 </code></pre>
 

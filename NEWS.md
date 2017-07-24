@@ -1,4 +1,27 @@
-gejsonio 0.3.2
+geojsonio 0.3.8
+===============
+
+### MINOR IMPROVEMENTS
+
+* `geojson_write` and `geojson_json` now pass `...` argument through to 
+`rgdal::writeOGR` or `jsonlite::toJSON` depending on the class/method. For 
+those methods that use the latter, this now allows setting of the `na` 
+argument to control how `NA` values are represented in json, and the 
+`pretty` argument to control whether or the resulting json is 
+pretty-formated or compact (#109) (#111)
+* Spelling/grammar fixes, thanks @patperu ! (#106)
+
+### BUG FIXES
+
+* `geojson_json` and `geojson_write` now convert unsupported classes to 
+their basic class before conversion and/or writing to geojson. This was most 
+commonly occurring with fields in `sf` objects calculated by `sf::st_area` 
+and `sf::st_length` which were of class `units`. (#107)
+* Fixed a bug occurring with `GDAL` version >= 2.2.0 where the layer name in 
+a geojson file was not detected properly (#108)
+
+
+geojsonio 0.3.2
 ==============
 
 ### BUG FIXES
@@ -7,7 +30,7 @@ gejsonio 0.3.2
 output, and to conditionally test only if `sf` is available (#103)
 
 
-gejsonio 0.3.0
+geojsonio 0.3.0
 ==============
 
 ### NEW FEATURES
