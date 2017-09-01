@@ -218,7 +218,7 @@ hr {
 <li><code>geojson_json()</code> - convert to geojson as json</li>
 <li><code>geojson_sp()</code> - convert output of <code>geojson_list()</code> or <code>geojson_json()</code> to spatial objects</li>
 <li><code>geojson_read()</code>/<code>topojson_read()</code> - read a geojson/topojson file from file path or URL</li>
-<li><code>geojson_write()</code> - write a geojson file locally (no write topojson yet)</li>
+<li><code>geojson_write()</code>/<code>topojson_write()</code> - write a geojson file locally (no write topojson yet)</li>
 </ul>
 
 <p>Each of the above functions have methods for various objects/classes, including <code>numeric</code>, <code>data.frame</code>, <code>list</code>, <code>SpatialPolygons</code>, <code>SpatialLines</code>, <code>SpatialPoints</code>, etc.</p>
@@ -387,7 +387,7 @@ s &lt;- SpatialPoints(cbind(x, y))
 <pre><code class="r">library(&#39;maps&#39;)
 data(us.cities)
 geojson_write(us.cities[1:2, ], lat = &#39;lat&#39;, lon = &#39;long&#39;)
-#&gt; &lt;geojson&gt;
+#&gt; &lt;geojson-file&gt;
 #&gt;   Path:       myfile.geojson
 #&gt;   From class: data.frame
 </code></pre>
@@ -440,7 +440,7 @@ out &lt;- topojson_read(url, verbose = FALSE)
 <pre><code class="r">(loc &lt;- as.location(file))
 #&gt; &lt;location&gt; 
 #&gt;    Type:  file 
-#&gt;    Location:  /Library/Frameworks/R.framework/Versions/3.4/Resources/library/geojsonio/examples/us_states.topojson
+#&gt;    Location:  /Users/sacmac/github/ropensci/geojsonio/inst/examples/us_states.topojson
 out &lt;- topojson_read(loc, verbose = FALSE)
 </code></pre>
 
