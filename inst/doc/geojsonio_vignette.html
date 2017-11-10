@@ -214,11 +214,11 @@ hr {
 <p>Functions in this package are organized first around what you&#39;re working with or want to get, geojson or topojson, then convert to or read from various formats:</p>
 
 <ul>
-<li><code>geojson_list()</code> - convert to geojson as R list format</li>
-<li><code>geojson_json()</code> - convert to geojson as json</li>
+<li><code>geojson_list()</code>/<code>topojson_list()</code> - convert to GeoJSON/TopoJSON as R list format</li>
+<li><code>geojson_json()</code>/<code>topojson_json()</code> - convert to GeoJSON/TopoJSON as JSON</li>
 <li><code>geojson_sp()</code> - convert output of <code>geojson_list()</code> or <code>geojson_json()</code> to spatial objects</li>
-<li><code>geojson_read()</code>/<code>topojson_read()</code> - read a geojson/topojson file from file path or URL</li>
-<li><code>geojson_write()</code>/<code>topojson_write()</code> - write a geojson file locally (no write topojson yet)</li>
+<li><code>geojson_read()</code>/<code>topojson_read()</code> - read a GeoJSON/TopoJSON file from file path or URL</li>
+<li><code>geojson_write()</code>/<code>topojson_write()</code> - write a GeoJSON/TopoJSON file locally</li>
 </ul>
 
 <p>Each of the above functions have methods for various objects/classes, including <code>numeric</code>, <code>data.frame</code>, <code>list</code>, <code>SpatialPolygons</code>, <code>SpatialLines</code>, <code>SpatialPoints</code>, etc.</p>
@@ -227,7 +227,7 @@ hr {
 
 <ul>
 <li><code>map_gist()</code> - push up a geojson or topojson file as a GitHub gist (renders as an interactive map) - See the <em>maps with geojsonio</em> vignette.</li>
-<li><code>map_leaf()</code> - create a local interactive map with the <code>leaflet</code> package - See the <em>maps with geojsonio</em> vignette. </li>
+<li><code>map_leaf()</code> - create a local interactive map with the <code>leaflet</code> package - See the <em>maps with geojsonio</em> vignette.</li>
 </ul>
 
 <h2>Install</h2>
@@ -259,7 +259,10 @@ hr {
 <p>as <em>json</em></p>
 
 <pre><code class="r">geojson_json(c(32.45, -99.74))
-#&gt; {&quot;type&quot;:&quot;FeatureCollection&quot;,&quot;features&quot;:[{&quot;type&quot;:&quot;Feature&quot;,&quot;geometry&quot;:{&quot;type&quot;:&quot;Point&quot;,&quot;coordinates&quot;:[32.45,-99.74]},&quot;properties&quot;:{}}]}
+#&gt; &lt;FeatureCollection&gt; 
+#&gt;   type:  FeatureCollection 
+#&gt;   no. features:  1 
+#&gt;   features (1st 5):  Point
 </code></pre>
 
 <p>as a <strong>list</strong></p>
@@ -285,7 +288,10 @@ hr {
 <pre><code class="r">library(&#39;maps&#39;)
 data(us.cities)
 geojson_json(us.cities[1:2, ], lat = &#39;lat&#39;, lon = &#39;long&#39;)
-#&gt; {&quot;type&quot;:&quot;FeatureCollection&quot;,&quot;features&quot;:[{&quot;type&quot;:&quot;Feature&quot;,&quot;geometry&quot;:{&quot;type&quot;:&quot;Point&quot;,&quot;coordinates&quot;:[-99.74,32.45]},&quot;properties&quot;:{&quot;name&quot;:&quot;Abilene TX&quot;,&quot;country.etc&quot;:&quot;TX&quot;,&quot;pop&quot;:&quot;113888&quot;,&quot;capital&quot;:&quot;0&quot;}},{&quot;type&quot;:&quot;Feature&quot;,&quot;geometry&quot;:{&quot;type&quot;:&quot;Point&quot;,&quot;coordinates&quot;:[-81.52,41.08]},&quot;properties&quot;:{&quot;name&quot;:&quot;Akron OH&quot;,&quot;country.etc&quot;:&quot;OH&quot;,&quot;pop&quot;:&quot;206634&quot;,&quot;capital&quot;:&quot;0&quot;}}]}
+#&gt; &lt;FeatureCollection&gt; 
+#&gt;   type:  FeatureCollection 
+#&gt;   no. features:  2 
+#&gt;   features (1st 5):  Point, Point
 </code></pre>
 
 <p>as a <strong>list</strong></p>
@@ -317,14 +323,10 @@ sp_poly &lt;- SpatialPolygons(list(poly1, poly2), 1:2)
 <p>to <strong>json</strong></p>
 
 <pre><code class="r">geojson_json(sp_poly)
-#&gt; {
-#&gt; &quot;type&quot;: &quot;FeatureCollection&quot;,
-#&gt; &quot;features&quot;: [
-#&gt; { &quot;type&quot;: &quot;Feature&quot;, &quot;id&quot;: 1, &quot;properties&quot;: { &quot;dummy&quot;: 0.0 }, &quot;geometry&quot;: { &quot;type&quot;: &quot;Polygon&quot;, &quot;coordinates&quot;: [ [ [ -100.0, 40.0 ], [ -90.0, 50.0 ], [ -85.0, 45.0 ], [ -100.0, 40.0 ] ] ] } },
-#&gt; { &quot;type&quot;: &quot;Feature&quot;, &quot;id&quot;: 2, &quot;properties&quot;: { &quot;dummy&quot;: 0.0 }, &quot;geometry&quot;: { &quot;type&quot;: &quot;Polygon&quot;, &quot;coordinates&quot;: [ [ [ -90.0, 30.0 ], [ -80.0, 40.0 ], [ -75.0, 35.0 ], [ -90.0, 30.0 ] ] ] } }
-#&gt; ]
-#&gt; }
-#&gt; 
+#&gt; &lt;FeatureCollection&gt; 
+#&gt;   type:  FeatureCollection 
+#&gt;   no. features:  2 
+#&gt;   features (1st 5):  Polygon, Polygon
 </code></pre>
 
 <p>to a <strong>list</strong></p>
@@ -353,17 +355,10 @@ s &lt;- SpatialPoints(cbind(x, y))
 <p>to <strong>json</strong></p>
 
 <pre><code class="r">geojson_json(s)
-#&gt; {
-#&gt; &quot;type&quot;: &quot;FeatureCollection&quot;,
-#&gt; &quot;features&quot;: [
-#&gt; { &quot;type&quot;: &quot;Feature&quot;, &quot;id&quot;: 1, &quot;properties&quot;: { &quot;dat&quot;: 1 }, &quot;geometry&quot;: { &quot;type&quot;: &quot;Point&quot;, &quot;coordinates&quot;: [ 1.0, 3.0 ] } },
-#&gt; { &quot;type&quot;: &quot;Feature&quot;, &quot;id&quot;: 2, &quot;properties&quot;: { &quot;dat&quot;: 2 }, &quot;geometry&quot;: { &quot;type&quot;: &quot;Point&quot;, &quot;coordinates&quot;: [ 2.0, 2.0 ] } },
-#&gt; { &quot;type&quot;: &quot;Feature&quot;, &quot;id&quot;: 3, &quot;properties&quot;: { &quot;dat&quot;: 3 }, &quot;geometry&quot;: { &quot;type&quot;: &quot;Point&quot;, &quot;coordinates&quot;: [ 3.0, 5.0 ] } },
-#&gt; { &quot;type&quot;: &quot;Feature&quot;, &quot;id&quot;: 4, &quot;properties&quot;: { &quot;dat&quot;: 4 }, &quot;geometry&quot;: { &quot;type&quot;: &quot;Point&quot;, &quot;coordinates&quot;: [ 4.0, 1.0 ] } },
-#&gt; { &quot;type&quot;: &quot;Feature&quot;, &quot;id&quot;: 5, &quot;properties&quot;: { &quot;dat&quot;: 5 }, &quot;geometry&quot;: { &quot;type&quot;: &quot;Point&quot;, &quot;coordinates&quot;: [ 5.0, 4.0 ] } }
-#&gt; ]
-#&gt; }
-#&gt; 
+#&gt; &lt;FeatureCollection&gt; 
+#&gt;   type:  FeatureCollection 
+#&gt;   no. features:  5 
+#&gt;   features (1st 5):  Point, Point, Point, Point, Point
 </code></pre>
 
 <p>to a <strong>list</strong></p>
@@ -404,7 +399,41 @@ plot(out)
 
 <h2>Topojson</h2>
 
-<p>In the current version of this package you can read topojson. Writing topojson was in this package, but is gone for now - will come back later as in interface to <a href="https://github.com/mbostock/topojson">topojson</a> via <a href="https://github.com/jeroenooms/V8">V8</a>. </p>
+<p>To JSON</p>
+
+<pre><code class="r">topojson_json(c(-99.74,32.45))
+#&gt; {&quot;type&quot;:&quot;Topology&quot;,&quot;objects&quot;:{&quot;foo&quot;:{&quot;type&quot;:&quot;GeometryCollection&quot;,&quot;geometries&quot;:[{&quot;type&quot;:&quot;Point&quot;,&quot;coordinates&quot;:[-99.74,32.45]}]}},&quot;arcs&quot;:[],&quot;bbox&quot;:[-99.74,32.45,-99.74,32.45]}
+</code></pre>
+
+<p>To a list</p>
+
+<pre><code class="r">library(sp)
+x &lt;- c(1,2,3,4,5)
+y &lt;- c(3,2,5,1,4)
+s &lt;- SpatialPoints(cbind(x,y))
+topojson_list(s)
+#&gt; $type
+#&gt; [1] &quot;Topology&quot;
+#&gt; 
+#&gt; $objects
+#&gt; $objects$foo
+#&gt; $objects$foo$type
+#&gt; [1] &quot;GeometryCollection&quot;
+#&gt; 
+#&gt; $objects$foo$geometries
+#&gt; $objects$foo$geometries[[1]]
+#&gt; $objects$foo$geometries[[1]]$type
+#&gt; [1] &quot;Point&quot;
+#&gt; 
+#&gt; $objects$foo$geometries[[1]]$coordinates
+#&gt; [1] 1 3
+#&gt; 
+#&gt; $objects$foo$geometries[[1]]$id
+#&gt; [1] 1
+#&gt; 
+#&gt; $objects$foo$geometries[[1]]$properties
+...
+</code></pre>
 
 <p>Read from a file</p>
 
@@ -440,7 +469,7 @@ out &lt;- topojson_read(url, verbose = FALSE)
 <pre><code class="r">(loc &lt;- as.location(file))
 #&gt; &lt;location&gt; 
 #&gt;    Type:  file 
-#&gt;    Location:  /Users/sacmac/github/ropensci/geojsonio/inst/examples/us_states.topojson
+#&gt;    Location:  /Library/Frameworks/R.framework/Versions/3.4/Resources/library/geojsonio/examples/us_states.topojson
 out &lt;- topojson_read(loc, verbose = FALSE)
 </code></pre>
 

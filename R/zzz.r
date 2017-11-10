@@ -1,12 +1,29 @@
 tg_compact <- function(l) Filter(Negate(is.null), l)
 
 to_json <- function(x, ...) {
-  structure(jsonlite::toJSON(x, ..., digits = 7, auto_unbox = TRUE, force = TRUE), 
+  structure(jsonlite::toJSON(x, ..., digits = 7, auto_unbox = TRUE, force = TRUE),
             class = c('json','geo_json'))
 }
 
-class_json <- function(x, ...) {
+class_json <- function(x, ..., type = "FeatureCollection") {
   structure(x, class = c('json','geo_json'))
+}
+
+geoclass <- function(x, type = "FeatureCollection") {
+  res <- switch(type,
+    "auto" = geojson::to_geojson(unclass(x)),
+    "Point" = geojson::point(unclass(x)),
+    "LineString" = geojson::linestring(unclass(x)),
+    "Polygon" = geojson::polygon(unclass(x)),
+    "MultiPoint" = geojson::multipoint(unclass(x)),
+    "MultiLineString" = geojson::multilinestring(unclass(x)),
+    "MultiPolygon" = geojson::multipolygon(unclass(x)),
+    "Feature" = geojson::feature(unclass(x)),
+    "FeatureCollection" = geojson::featurecollection(unclass(x)),
+    "GeometryCollection" = geojson::geometrycollection(unclass(x))
+  )
+  class(res) <- c(class(res), c("geo_json", "json"))
+  return(res)
 }
 
 list_to_geo_list <- function(x, lat, lon, geometry = "point", type = "FeatureCollection", unnamed = FALSE, group=NULL){
@@ -81,7 +98,7 @@ get_vals <- function(v, lat, lon){
 
 df_to_geo_list <- function(x, lat, lon, geometry, type, group, ...){
   x <- apply(x, 1, as.list)
-  list_to_geo_list(x = x, lat = lat, lon = lon, geometry = geometry, 
+  list_to_geo_list(x = x, lat = lat, lon = lon, geometry = geometry,
                    type = type, unnamed = TRUE, group = group, ...)
 }
 
@@ -265,8 +282,8 @@ spdftogeolist <- function(x){
   }
 }
 
-write_geojson <- function(input, file = "myfile.geojson", precision = NULL, 
-                          overwrite = TRUE, convert_wgs84 = FALSE, crs = NULL, 
+write_geojson <- function(input, file = "myfile.geojson", precision = NULL,
+                          overwrite = TRUE, convert_wgs84 = FALSE, crs = NULL,
                           file_ext = ".geojson", ...){
   if (!grepl(sprintf("\\%s$", file_ext), file)) {
     file <- paste0(file, file_ext)
@@ -274,17 +291,19 @@ write_geojson <- function(input, file = "myfile.geojson", precision = NULL,
   file <- path.expand(file)
   destpath <- dirname(file)
   if (!file.exists(destpath)) dir.create(destpath)
-  write_ogr(input, tempfile(), file, precision, overwrite, 
+  temp <- tempfile()
+  on.exit(unlink(temp))
+  write_ogr(input, temp, file, precision, overwrite,
             convert_wgs84 = convert_wgs84, crs = crs, ...)
 }
 
-write_ogr <- function(input, dir, file, precision = NULL, overwrite, 
+write_ogr <- function(input, dir, file, precision = NULL, overwrite,
                       convert_wgs84 = FALSE, crs = NULL, ...){
-  
+
   if (convert_wgs84) {
     input <- convert_wgs84(input, crs = crs)
   }
-  
+
   input@data <- convert_unsupported_classes(input@data)
   dots <- list(...)
   if (!is.null(precision)) {
@@ -313,22 +332,24 @@ convert_unsupported_classes <- function(df) {
   return(df)
 }
 
-geojson_rw <- function(input, target = c("char", "list"), 
+geojson_rw <- function(input, target = c("char", "list"),
                        convert_wgs84 = FALSE, crs = NULL, ...){
 
-  read_fun <- switch(target, 
-                     char = geojson_file_to_char, 
+  read_fun <- switch(target,
+                     char = geojson_file_to_char,
                      list = geojson_file_to_list)
-  
+
   if (inherits(input, "SpatialCollections")) {
     tmp <- tempfile(fileext = ".geojson")
-    tmp2 <- suppressMessages(geojson_write(input, file = tmp, 
+    on.exit(unlink(tmp))
+    tmp2 <- suppressMessages(geojson_write(input, file = tmp,
                                            convert_wgs84 = convert_wgs84, crs = crs))
     paths <- vapply(tg_compact(tmp2), "[[", "", "path")
     lapply(paths, read_fun, ...)
   } else {
     tmp <- tempfile(fileext = ".geojson")
-    suppressMessages(geojson_write(input, file = tmp, 
+    on.exit(unlink(tmp))
+    suppressMessages(geojson_write(input, file = tmp,
                                    convert_wgs84 = convert_wgs84, crs = crs))
     read_fun(tmp, ...)
   }
@@ -388,3 +409,7 @@ is.named <- function(x) {
   is.character(names(x[[1]]))
 }
 
+check_type <- function(x) {
+  types <- c('FeatureCollection', 'GeometryCollection')
+  if (!x %in% types) stop("'type' must be one of: ", paste0(types, collapse=", "))
+}

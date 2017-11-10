@@ -14,11 +14,11 @@ This package is a utility to convert geographic data to GeoJSON and TopoJSON for
 
 Functions in this package are organized first around what you're working with or want to get, GeoJSON or TopoJSON, then convert to or read from various formats:
 
-* `geojson_list()` - convert to GeoJSON as R list format
-* `geojson_json()` - convert to GeoJSON as json
+* `geojson_list()`/`topojson_list()` - convert to GeoJSON/TopoJSON as R list format
+* `geojson_json()`/`topojson_json()` - convert to GeoJSON/TopoJSON as JSON
 * `geojson_sp()` - convert output of `geojson_list()` or `geojson_json()` to spatial objects
 * `geojson_read()`/`topojson_read()` - read a GeoJSON/TopoJSON file from file path or URL
-* `geojson_write()`/`topojson_write()` - write a GeoJSON file locally (topojson coming later)
+* `geojson_write()`/`topojson_write()` - write a GeoJSON/TopoJSON file locally
 
 Each of the above functions have methods for various objects/classes, including `numeric`, `data.frame`, `list`, `SpatialPolygons`, `SpatialLines`, `SpatialPoints`, etc.
 
@@ -27,7 +27,7 @@ Additional functions:
 * `map_gist()` - push up a GeoJSON or topojson file as a GitHub gist (renders as an interactive map)
 * `map_leaf()` - create a local interactive map using the `leaflet` package
 
-## *json Info
+## \*json Info
 
 * GeoJSON - [spec](https://tools.ietf.org/html/rfc7946)
 * [GeoJSON lint](http://geojsonlint.com/)
@@ -94,14 +94,17 @@ library("geojsonio")
 
 ## GeoJSON
 
-### Convert various formats to geojson
+### Convert various formats to GeoJSON
 
 From a `numeric` vector of length 2, as json or list
 
 
 ```r
 geojson_json(c(32.45, -99.74))
-#> {"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"Point","coordinates":[32.45,-99.74]},"properties":{}}]}
+#> <FeatureCollection> 
+#>   type:  FeatureCollection 
+#>   no. features:  1 
+#>   features (1st 5):  Point
 ```
 
 
@@ -109,12 +112,12 @@ geojson_json(c(32.45, -99.74))
 geojson_list(c(32.45, -99.74))
 #> $type
 #> [1] "FeatureCollection"
-#>
+#> 
 #> $features
 #> $features[[1]]
 #> $features[[1]]$type
 #> [1] "Feature"
-#>
+#> 
 #> $features[[1]]$geometry
 #> $features[[1]]$geometry$type
 ...
@@ -127,7 +130,10 @@ From a `data.frame`
 library('maps')
 data(us.cities)
 geojson_json(us.cities[1:2, ], lat = 'lat', lon = 'long')
-#> {"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"Point","coordinates":[-99.74,32.45]},"properties":{"name":"Abilene TX","country.etc":"TX","pop":"113888","capital":"0"}},{"type":"Feature","geometry":{"type":"Point","coordinates":[-81.52,41.08]},"properties":{"name":"Akron OH","country.etc":"OH","pop":"206634","capital":"0"}}]}
+#> <FeatureCollection> 
+#>   type:  FeatureCollection 
+#>   no. features:  2 
+#>   features (1st 5):  Point, Point
 ```
 
 
@@ -135,12 +141,12 @@ geojson_json(us.cities[1:2, ], lat = 'lat', lon = 'long')
 geojson_list(us.cities[1:2, ], lat = 'lat', lon = 'long')
 #> $type
 #> [1] "FeatureCollection"
-#>
+#> 
 #> $features
 #> $features[[1]]
 #> $features[[1]]$type
 #> [1] "Feature"
-#>
+#> 
 #> $features[[1]]$geometry
 #> $features[[1]]$geometry$type
 ...
@@ -163,14 +169,10 @@ to json
 
 ```r
 geojson_json(sp_poly)
-#> {
-#> "type": "FeatureCollection",
-#> "features": [
-#> { "type": "Feature", "id": 1, "properties": { "dummy": 0.0 }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -100.0, 40.0 ], [ -90.0, 50.0 ], [ -85.0, 45.0 ], [ -100.0, 40.0 ] ] ] } },
-#> { "type": "Feature", "id": 2, "properties": { "dummy": 0.0 }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -90.0, 30.0 ], [ -80.0, 40.0 ], [ -75.0, 35.0 ], [ -90.0, 30.0 ] ] ] } }
-#> ]
-#> }
-#>
+#> <FeatureCollection> 
+#>   type:  FeatureCollection 
+#>   no. features:  2 
+#>   features (1st 5):  Polygon, Polygon
 ```
 
 to list
@@ -180,14 +182,14 @@ to list
 geojson_list(sp_poly)$features[[1]]
 #> $type
 #> [1] "Feature"
-#>
+#> 
 #> $id
 #> [1] 1
-#>
+#> 
 #> $properties
 #> $properties$dummy
 #> [1] 0
-#>
+#> 
 ...
 ```
 
@@ -206,12 +208,12 @@ b <- geojson_list(vecs, geometry = "polygon")
 a + b
 #> $type
 #> [1] "FeatureCollection"
-#>
+#> 
 #> $features
 #> $features[[1]]
 #> $features[[1]]$type
 #> [1] "Feature"
-#>
+#> 
 #> $features[[1]]$geometry
 #> $features[[1]]$geometry$type
 ...
@@ -254,15 +256,55 @@ names(out$features[[1]])
 
 ## TopoJSON
 
+### to JSON
+
+
+```r
+topojson_json(c(-99.74,32.45))
+#> {"type":"Topology","objects":{"foo":{"type":"GeometryCollection","geometries":[{"type":"Point","coordinates":[-99.74,32.45]}]}},"arcs":[],"bbox":[-99.74,32.45,-99.74,32.45]}
+```
+
+### to list
+
+
+```r
+library(sp)
+x <- c(1,2,3,4,5)
+y <- c(3,2,5,1,4)
+s <- SpatialPoints(cbind(x,y))
+topojson_list(s)
+#> $type
+#> [1] "Topology"
+#> 
+#> $objects
+#> $objects$foo
+#> $objects$foo$type
+#> [1] "GeometryCollection"
+#> 
+#> $objects$foo$geometries
+#> $objects$foo$geometries[[1]]
+#> $objects$foo$geometries[[1]]$type
+#> [1] "Point"
+#> 
+#> $objects$foo$geometries[[1]]$coordinates
+#> [1] 1 3
+#> 
+#> $objects$foo$geometries[[1]]$id
+#> [1] 1
+#> 
+#> $objects$foo$geometries[[1]]$properties
+...
+```
+
 ### Write TopoJSON
 
 
 ```r
 library('maps')
 data(us.cities)
-geojson_write(us.cities[1:2, ], lat = 'lat', lon = 'long')
-#> <geojson-file>
-#>   Path:       myfile.geojson
+topojson_write(us.cities[1:2, ], lat = 'lat', lon = 'long')
+#> <topojson-file>
+#>   Path:       myfile.json
 #>   From class: data.frame
 ```
 
@@ -276,7 +318,7 @@ out <- topojson_read(url, verbose = FALSE)
 plot(out)
 ```
 
-![plot of chunk unnamed-chunk-19](inst/img/unnamed-chunk-19-1.png)
+![plot of chunk unnamed-chunk-21](inst/img/unnamed-chunk-21-1.png)
 
 ## Use case: Play with US states
 
@@ -307,7 +349,7 @@ ggplot(df, aes(long, lat, group = group)) +
   facet_wrap(~.id, scales = "free")
 ```
 
-![plot of chunk unnamed-chunk-21](inst/img/unnamed-chunk-21-1.png)
+![plot of chunk unnamed-chunk-23](inst/img/unnamed-chunk-23-1.png)
 
 Okay, so the maps are not quite right (stretched to fit each panel), but you get the idea.
 
@@ -321,17 +363,14 @@ x <- '{"type": "LineString", "coordinates": [ [100.0, 0.0], [101.0, 1.0] ]}'
 (topo_json <- geo2topo(x))
 #> {"type":"Topology","objects":{"foo":{"type":"LineString","arcs":[0]}},"arcs":[[[100,0],[101,1]]],"bbox":[100,0,101,1]}
 topo2geo(topo_json)
-#> OGR data source with driver: GeoJSON
+#> OGR data source with driver: GeoJSON 
 #> Source: "{"type":"Topology","objects":{"foo":{"type":"LineString","arcs":[0]}},"arcs":[[[100,0],[101,1]]],"bbox":[100,0,101,1]}", layer: "TopoJSON"
 #> with 1 features
 #> It has 1 fields
-#> {
-#> "type": "FeatureCollection",
-#> "features": [
-#> { "type": "Feature", "id": 0, "properties": { "id": "foo" }, "geometry": { "type": "LineString", "coordinates": [ [ 100.0, 0.0 ], [ 201.0, 1.0 ] ] } }
-#> ]
-#> }
-#>
+#> <FeatureCollection> 
+#>   type:  FeatureCollection 
+#>   no. features:  1 
+#>   features (1st 5):  LineString
 ```
 
 
@@ -341,4 +380,3 @@ topo2geo(topo_json)
 * License: MIT
 * Get citation information for `geojsonio` in R doing `citation(package = 'geojsonio')`
 * Please note that this project is released with a [Contributor Code of Conduct](CONDUCT.md). By participating in this project you agree to abide by its terms.
-
