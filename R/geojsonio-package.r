@@ -17,6 +17,8 @@
 #'  to GeoJSON or TopoJSON as JSON
 #'  \item \code{\link{geojson_sp}} - convert to a spatial object from
 #'  \code{geojson_list} or \code{geojson_json}
+#'  \item \code{\link{geojson_sf}} - convert to an sf object from
+#'  \code{geojson_list} or \code{geojson_json}
 #'  \item \code{\link{geojson_read}} / \code{\link{topojson_read}} - read a
 #'  GeoJSON/TopoJSON file from file path or URL
 #'  \item \code{\link{geojson_write}} / \code{\link{topojson_write}} - write
@@ -45,6 +47,7 @@
 #' as input.
 #'
 #' @import methods sp rgeos
+#' @importFrom sf st_crs st_transform st_read
 #' @importFrom httr GET POST content stop_for_status upload_file
 #' @importFrom maptools readShapeSpatial
 #' @importFrom rgdal readOGR writeOGR ogrListLayers

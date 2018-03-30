@@ -27,8 +27,11 @@ polygons - doesn't apply for points}
 \item{type}{(character) The type of collection. One of 'auto' (default
 for 'sf' objects),
 'FeatureCollection' (default for everything else), or 'GeometryCollection'.
-This is ignored for \code{Spatial} objects as it will always produce a
-"FeatureCollection"}
+"skip" skips the coercion with package \pkg{geojson} 
+functions; skipping can save significant run time on larger geojson 
+objects. \code{Spatial} objects can only accept "FeatureCollection" or "skip".
+"skip" is not available as an option for \code{numeric}, \code{list}, 
+and \code{data.frame} classes}
 
 \item{convert_wgs84}{Should the input be converted to the
 \href{https://tools.ietf.org/html/rfc7946}{standard coordinate reference
@@ -130,7 +133,6 @@ poly1 <- Polygons(list(Polygon(cbind(c(-100,-90,-85,-100),
 poly2 <- Polygons(list(Polygon(cbind(c(-90,-80,-75,-90),
    c(30,40,35,30)))), "2")
 sp_poly <- SpatialPolygons(list(poly1, poly2), 1:2)
-geojson_json(sp_poly)
 geojson_json(sp_poly)
 
 ## Another SpatialPolygons
@@ -253,5 +255,15 @@ if (require(sf)) {
 ## Pretty print a json string
 geojson_json(c(-99.74,32.45))
 geojson_json(c(-99.74,32.45)) \%>\% pretty
+
+# skipping the pretty geojson class coercion with the geojson pkg
+if (require(sf)) {
+  library(sf)
+  p1 <- rbind(c(0,0), c(1,0), c(3,2), c(2,4), c(1,4), c(0,0))
+  p2 <- rbind(c(5,5), c(5,6), c(4,5), c(5,5))
+  poly_sfc <- st_sfc(st_polygon(list(p1)), st_polygon(list(p2)))
+  geojson_json(poly_sfc)
+  geojson_json(poly_sfc, type = "skip")
+}
 }
 }
