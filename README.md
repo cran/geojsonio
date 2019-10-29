@@ -38,7 +38,7 @@ Additional functions:
 
 ## Install
 
-A note about installing `rgdal` and `rgeos` - these two packages are built on top of C libraries, and their installation often causes trouble for Mac and Linux users because no binaries are provided on CRAN for those platforms. Other dependencies in `geojsonio` should install easily automatically when you install `geojsonio`. Change to the version of `rgdal` and `GDAL` you have):
+A note about installing `rgdal` and `rgeos` - these two packages are built on top of C libraries, and their installation often causes trouble for Linux users because no binaries are provided on CRAN for those platforms. Other dependencies in `geojsonio` should install easily automatically when you install `geojsonio`. Change to the version of `rgdal` and `GDAL` you have):
 
 _Mac_
 
@@ -52,7 +52,7 @@ Then install `rgdal` and `rgeos`
 
 
 ```r
-install.packages("rgdal", type = "source", configure.args = "--with-gdal-config=/Library/Frameworks/GDAL.framework/Versions/1.11/unix/bin/gdal-config --with-proj-include=/Library/Frameworks/PROJ.framework/unix/include --with-proj-lib=/Library/Frameworks/PROJ.framework/unix/lib")
+install.packages("rgdal", type = "source", configure.args = "--with-gdal-config=/usr/local/Cellar/gdal/2.4.2/bin/gdal-config --with-proj-include=/usr/local/Cellar/gdal/2.4.2/include --with-proj-lib=/usr/local/Cellar/gdal/2.4.2/lib")
 install.packages("rgeos", type = "source")
 ```
 
@@ -253,9 +253,9 @@ geojson_write(us.cities[1:2, ], lat = 'lat', lon = 'long')
 file <- system.file("examples", "california.geojson", package = "geojsonio")
 out <- geojson_read(file)
 names(out)
-#> [1] "type"     "crs"      "features"
+#> [1] "type"     "name"     "crs"      "features"
 names(out$features[[1]])
-#> [1] "type"       "_id"        "properties" "geometry"
+#> [1] "type"       "properties" "geometry"
 ```
 
 ## TopoJSON
@@ -312,17 +312,25 @@ topojson_write(us.cities[1:2, ], lat = 'lat', lon = 'long')
 #>   From class: data.frame
 ```
 
+
+
 ### Read TopoJSON
 
 
 ```r
-library("sp")
-url <- "https://raw.githubusercontent.com/shawnbot/d3-cartogram/master/data/us-states.topojson"
-out <- topojson_read(url, verbose = FALSE)
+file <- system.file("examples", "us_states.topojson", package = "geojsonio")
+out <- topojson_read(file)
+#> Reading layer `states' from data source `/Library/Frameworks/R.framework/Versions/3.6/Resources/library/geojsonio/examples/us_states.topojson' using driver `TopoJSON'
+#> Simple feature collection with 51 features and 1 field
+#> geometry type:  MULTIPOLYGON
+#> dimension:      XY
+#> bbox:           xmin: -171.7911 ymin: 18.91619 xmax: -66.96466 ymax: 71.35776
+#> epsg (SRID):    NA
+#> proj4string:    NA
 plot(out)
 ```
 
-![plot of chunk unnamed-chunk-21](inst/img/unnamed-chunk-21-1.png)
+![plot of chunk unnamed-chunk-22](inst/img/unnamed-chunk-22-1.png)
 
 ## Use case: Play with US states
 
@@ -346,14 +354,14 @@ Make a faceted plot
 library('ggplot2')
 library('plyr')
 st_use <- st_files[7:13]
-geo <- lapply(st_use, geojson_read, method = "local", what = "sp")
+geo <- lapply(st_use, geojson_read, what = "sp")
 df <- ldply(setNames(lapply(geo, fortify), gsub("\\.geojson", "", st_names[7:13])))
 ggplot(df, aes(long, lat, group = group)) +
   geom_polygon() +
   facet_wrap(~.id, scales = "free")
 ```
 
-![plot of chunk unnamed-chunk-23](inst/img/unnamed-chunk-23-1.png)
+![plot of chunk unnamed-chunk-24](inst/img/unnamed-chunk-24-1.png)
 
 Okay, so the maps are not quite right (stretched to fit each panel), but you get the idea.
 
@@ -379,6 +387,9 @@ topo2geo(topo_json)
 * Please [report any issues or bugs](https://github.com/ropensci/geojsonio/issues).
 * License: MIT
 * Get citation information for `geojsonio` in R doing `citation(package = 'geojsonio')`
-* Please note that this project is released with a [Contributor Code of Conduct](CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.
+* Please note that this project is released with a [Contributor Code of Conduct][coc].
+By participating in this project you agree to abide by its terms.
 
 [![rofooter](https://ropensci.org/public_images/github_footer.png)](https://ropensci.org)
+
+[coc]: https://github.com/ropensci/geojsonio/blob/master/CODE_OF_CONDUCT.md
