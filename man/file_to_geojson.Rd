@@ -4,8 +4,15 @@
 \alias{file_to_geojson}
 \title{Convert spatial data files to GeoJSON from various formats.}
 \usage{
-file_to_geojson(input, method = "web", output = ".", parse = FALSE,
-  encoding = "CP1250", verbose = FALSE, ...)
+file_to_geojson(
+  input,
+  method = "web",
+  output = ".",
+  parse = FALSE,
+  encoding = "CP1250",
+  verbose = FALSE,
+  ...
+)
 }
 \arguments{
 \item{input}{The file being uploaded, path to the file on your machine.}
@@ -13,7 +20,7 @@ file_to_geojson(input, method = "web", output = ".", parse = FALSE,
 \item{method}{(character) One of "web" (default) or "local". Matches on
 partial strings. This parameter determines how the data is
 read. "web" means we use the Ogre web service, and "local" means we use
-\pkg{rgdal}. See Details fore more.}
+\pkg{sf}. See Details fore more.}
 
 \item{output}{Destination for output geojson file. Defaults to current
 working directory, and gives a random alphanumeric file name}
@@ -21,23 +28,26 @@ working directory, and gives a random alphanumeric file name}
 \item{parse}{(logical) To parse geojson to data.frame like structures if
 possible. Default: \code{FALSE}}
 
-\item{encoding}{(character) The encoding passed to
-\code{\link[rgdal:readOGR]{rgdal::readOGR()}}.  Default: CP1250}
+\item{encoding}{(character) The encoding passed to \code{\link[sf:st_read]{sf::st_read()}}.
+Default: CP1250}
 
-\item{verbose}{(logical) Printing of \code{\link[rgdal:readOGR]{rgdal::readOGR()}} progress.
+\item{verbose}{(logical) Printing of \code{\link[sf:st_read]{sf::st_read()}} progress.
 Default: \code{FALSE}}
 
-\item{...}{Additional parameters passed to \code{\link[rgdal]{readOGR}}}
+\item{...}{Additional parameters passed to \code{\link[sf]{st_read}}}
+}
+\value{
+path for the geojson file
 }
 \description{
 You can use a web interface called Ogre, or do conversions locally using the
-rgdal package.
+sf package.
 }
 \section{Method parameter}{
 
 The web option uses the Ogre web API. Ogre currently has an output size
 limit of 15MB. See here \url{http://ogre.adc4gis.com/} for info on the
-Ogre web API. The local option uses the function \code{\link{writeOGR}}
+Ogre web API. The local option uses the function \code{\link[sf]{st_write}}
 from the package rgdal.
 }
 
@@ -90,14 +100,13 @@ list.files(dir)
 shpfile <- file.path(dir, "bison-Bison_bison-20130704-120856.shp")
 file_to_geojson(shpfile, method='local', output='shp_local')
 
-# Neighborhoods in the US
-## beware, this is a long running example
-# url <- 'http://www.nws.noaa.gov/geodata/catalog/national/data/ci08au12.zip'
-# out <- file_to_geojson(input=url, method='web', output='cities')
+# US National Weather Service Hydrologic service area boundaries
+url <- 'https://www.weather.gov/source/gis/Shapefiles/Misc/hs05jn19.zip'
+out <- file_to_geojson(input=url, method='web', output='hsa')
 
 # geojson with .json extension
 ## this doesn't work anymore, hmmm
-# x <- gsub("\\n", "", paste0('https://gist.githubusercontent.com/hunterowens/
+# x <- gsub("\n", "", paste0('https://gist.githubusercontent.com/hunterowens/
 # 25ea24e198c80c9fbcc7/raw/7fd3efda9009f902b5a991a506cea52db19ba143/
 # wards2014.json', collapse = ""))
 # res <- file_to_geojson(x)

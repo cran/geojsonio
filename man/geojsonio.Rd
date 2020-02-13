@@ -3,13 +3,12 @@
 \docType{package}
 \name{geojsonio}
 \alias{geojsonio}
-\alias{geojsonio-package}
 \title{\strong{I/O for GeoJSON}}
 \description{
 Convert various data formats to/from GeoJSON or TopoJSON. This
 package focuses mostly on converting lists, data.frame's, numeric,
 SpatialPolygons, SpatialPolygonsDataFrame, and more to GeoJSON with the
-help of \pkg{rgdal} and friends. You can currently read TopoJSON - writing
+help of \pkg{sf}. You can currently read TopoJSON - writing
 TopoJSON will come in a future version of this package.
 }
 \section{Package organization}{

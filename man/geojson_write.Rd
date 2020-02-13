@@ -4,9 +4,19 @@
 \alias{geojson_write}
 \title{Convert many input types with spatial data to a geojson file}
 \usage{
-geojson_write(input, lat = NULL, lon = NULL, geometry = "point",
-  group = NULL, file = "myfile.geojson", overwrite = TRUE,
-  precision = NULL, convert_wgs84 = FALSE, crs = NULL, ...)
+geojson_write(
+  input,
+  lat = NULL,
+  lon = NULL,
+  geometry = "point",
+  group = NULL,
+  file = "myfile.geojson",
+  overwrite = TRUE,
+  precision = NULL,
+  convert_wgs84 = FALSE,
+  crs = NULL,
+  ...
+)
 }
 \arguments{
 \item{input}{Input list, data.frame, spatial class, or sf class.
@@ -53,7 +63,7 @@ object already has a CRS.}
 \item{...}{Further args passed on to internal functions. For Spatial*
 classes, data.frames,
 regular lists, and numerics, it is passed through to
-\code{\link[rgdal:writeOGR]{rgdal::writeOGR()}}. For sf classes,
+\code{\link[sf:st_write]{sf::st_write()}}. For sf classes,
 geo_lists and json classes, it is passed through to
 \code{\link[jsonlite:toJSON]{jsonlite::toJSON()}}.}
 }

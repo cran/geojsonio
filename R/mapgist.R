@@ -14,7 +14,7 @@
 #' (=no description)
 #' @param public (logical) Want gist to be public or not? Default: `TRUE`
 #' @param browse If `TRUE` (default) the map opens in your default browser.
-#' @param ... Further arguments passed on to [httr::POST()]
+#' @param ... Further arguments passed on to `httr::POST`
 #'
 #' @description There are two ways to authorize to work with your GitHub
 #' account:
@@ -33,6 +33,8 @@
 #' be used.
 #'
 #' @examples \dontrun{
+#' if (!identical(Sys.getenv("GITHUB_PAT"), "")) {
+#' 
 #' # From file
 #' file <- "myfile.geojson"
 #' geojson_write(us_cities[1:20, ], lat='lat', lon='long', file = file)
@@ -152,6 +154,8 @@
 #' dat <- data.frame(id = c(1,2), value = 3:4)
 #' r1r2df <- SpatialRingsDataFrame(r1r2, data = dat)
 #' map_gist(r1r2df)
+#' 
+#' }
 #' }
 
 map_gist <- function(input, lat = "lat", lon = "long", geometry = "point",

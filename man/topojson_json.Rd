@@ -5,9 +5,19 @@
 \title{Convert many input types with spatial data to TopoJSON
 as a JSON string}
 \usage{
-topojson_json(input, lat = NULL, lon = NULL, group = NULL,
-  geometry = "point", type = "FeatureCollection",
-  convert_wgs84 = FALSE, crs = NULL, ...)
+topojson_json(
+  input,
+  lat = NULL,
+  lon = NULL,
+  group = NULL,
+  geometry = "point",
+  type = "FeatureCollection",
+  convert_wgs84 = FALSE,
+  crs = NULL,
+  object_name = "foo",
+  quantization = 0,
+  ...
+)
 }
 \arguments{
 \item{input}{Input list, data.frame, spatial class, or sf class. Inputs can
@@ -46,10 +56,17 @@ an epsg code as a four or five digit integer or a valid proj4 string.
 This argument will be ignored if \code{convert_wgs84} is \code{FALSE} or
 the object already has a CRS.}
 
-\item{...}{Further args passed on to internal functions. For Spatial*
-classes, it is passed through to
-\code{\link[rgdal:writeOGR]{rgdal::writeOGR()}}. For sf classes, data.frames, lists, numerics,
-and geo_lists, it is passed through to \code{\link[jsonlite:toJSON]{jsonlite::toJSON()}}}
+\item{object_name}{(character) name to give to the TopoJSON object created.
+Default: "foo"}
+
+\item{quantization}{(numeric) quantization parameter, use this to
+quantize geometry prior to computing topology. Typical values are powers of
+ten (\code{1e4}, \code{1e5}, ...), default is \code{0} to not perform quantization.
+For more information about quantization, see this by Mike Bostock
+https://stackoverflow.com/questions/18900022/topojson-quantization-vs-simplification/18921214#18921214}
+
+\item{...}{args passed down to \code{\link[=geojson_json]{geojson_json()}}; see \code{\link[=geojson_json]{geojson_json()}} for
+help on what's supported here}
 }
 \value{
 An object of class \code{geo_json} (and \code{json})
@@ -118,7 +135,7 @@ library("sp")
 library("rgeos")
 pt <- SpatialPoints(coordinates(list(x = 0, y = 0)), CRS("+proj=longlat +datum=WGS84"))
 ## transfrom to web mercator becuase geos needs project coords
-crs <- gsub("\\n", "", paste0("+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0
+crs <- gsub("\n", "", paste0("+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0
    +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs", collapse = ""))
 pt <- spTransform(pt, CRS(crs))
 ## buffer

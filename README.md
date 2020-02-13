@@ -5,6 +5,7 @@ geojsonio
 
 [![cran checks](https://cranchecks.info/badges/worst/geojsonio)](https://cranchecks.info/pkgs/geojsonio)
 [![Build Status](https://api.travis-ci.org/ropensci/geojsonio.png)](https://travis-ci.org/ropensci/geojsonio)
+[![R build status](https://github.com/ropensci/geojsonio/workflows/R-CMD-check/badge.svg)](https://github.com/ropensci/geojsonio)
 [![codecov.io](https://codecov.io/github/ropensci/geojsonio/coverage.svg?branch=master)](https://codecov.io/github/ropensci/geojsonio?branch=master)
 [![rstudio mirror downloads](https://cranlogs.r-pkg.org/badges/geojsonio)](https://github.com/metacran/cranlogs.app)
 [![cran version](https://www.r-pkg.org/badges/version/geojsonio)](https://cran.r-project.org/package=geojsonio)
@@ -38,7 +39,7 @@ Additional functions:
 
 ## Install
 
-A note about installing `rgdal` and `rgeos` - these two packages are built on top of C libraries, and their installation often causes trouble for Linux users because no binaries are provided on CRAN for those platforms. Other dependencies in `geojsonio` should install easily automatically when you install `geojsonio`. Change to the version of `rgdal` and `GDAL` you have):
+A note about installing `rgeos` - built on top of C libraries, and installation often causes trouble for Linux users because no binaries are provided on CRAN for those platforms. Other dependencies in `geojsonio` should install easily automatically when you install `geojsonio`.
 
 _Mac_
 
@@ -48,11 +49,10 @@ Install `GDAL` on the command line first, e.g., using `homebrew`
 brew install gdal
 ```
 
-Then install `rgdal` and `rgeos`
+Then install `rgeos`
 
 
 ```r
-install.packages("rgdal", type = "source", configure.args = "--with-gdal-config=/usr/local/Cellar/gdal/2.4.2/bin/gdal-config --with-proj-include=/usr/local/Cellar/gdal/2.4.2/include --with-proj-lib=/usr/local/Cellar/gdal/2.4.2/lib")
 install.packages("rgeos", type = "source")
 ```
 
@@ -66,11 +66,10 @@ sudo apt-get install libgdal1-dev libgdal-dev libgeos-c1 libproj-dev
 
 > Note: if you have trouble installing rgeos, try installing `libgeos++-dev`
 
-Then install `rgdal` and `rgeos`
+Then install `rgeos`
 
 
 ```r
-install.packages("rgdal", type = "source")
 install.packages("rgeos", type = "source")
 ```
 
@@ -330,7 +329,7 @@ out <- topojson_read(file)
 plot(out)
 ```
 
-![plot of chunk unnamed-chunk-22](inst/img/unnamed-chunk-22-1.png)
+![plot of chunk unnamed-chunk-22](man/figures/unnamed-chunk-22-1.png)
 
 ## Use case: Play with US states
 
@@ -340,9 +339,10 @@ Get some geojson
 
 
 ```r
-library('httr')
-res <- GET('https://api.github.com/repos/glynnbird/usstatesgeojson/contents')
-st_names <- Filter(function(x) grepl("\\.geojson", x), sapply(content(res), "[[", "name"))
+library('crul')
+res <- HttpClient$new('https://api.github.com')$get('repos/glynnbird/usstatesgeojson/contents')
+out <- jsonlite::fromJSON(res$parse("UTF-8"), FALSE)
+st_names <- Filter(function(x) grepl("\\.geojson", x), sapply(out, "[[", "name"))
 base <- 'https://raw.githubusercontent.com/glynnbird/usstatesgeojson/master/'
 st_files <- paste0(base, st_names)
 ```
@@ -361,7 +361,7 @@ ggplot(df, aes(long, lat, group = group)) +
   facet_wrap(~.id, scales = "free")
 ```
 
-![plot of chunk unnamed-chunk-24](inst/img/unnamed-chunk-24-1.png)
+![plot of chunk unnamed-chunk-24](man/figures/unnamed-chunk-24-1.png)
 
 Okay, so the maps are not quite right (stretched to fit each panel), but you get the idea.
 

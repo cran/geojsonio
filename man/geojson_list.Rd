@@ -4,9 +4,18 @@
 \alias{geojson_list}
 \title{Convert many input types with spatial data to geojson specified as a list}
 \usage{
-geojson_list(input, lat = NULL, lon = NULL, group = NULL,
-  geometry = "point", type = "FeatureCollection",
-  convert_wgs84 = FALSE, crs = NULL, precision = NULL, ...)
+geojson_list(
+  input,
+  lat = NULL,
+  lon = NULL,
+  group = NULL,
+  geometry = "point",
+  type = "FeatureCollection",
+  convert_wgs84 = FALSE,
+  crs = NULL,
+  precision = NULL,
+  ...
+)
 }
 \arguments{
 \item{input}{Input list, data.frame, spatial class, or sf class. Inputs can
@@ -46,7 +55,7 @@ geojson file. Only used with classes from \pkg{sp}\pkg{rgeos} classes;
 ignored for other classes. Using fewer decimal places can decrease file
 sizes (at the
 cost of precision). This changes the underlying precision stored in the
-data. \code{options(digits = <some number>)} changes the maximum number of
+data. \verb{options(digits = <some number>)} changes the maximum number of
 digits displayed (to find out what yours is set at see
 \code{getOption("digits")}); the value of this parameter will change what's
 displayed in your console up to the value of \code{getOption("digits")}}
@@ -58,8 +67,7 @@ Convert many input types with spatial data to geojson specified as a list
 }
 \details{
 This function creates a geojson structure as an R list; it does
-not write a file using \pkg{rgdal} - see \code{\link[=geojson_write]{geojson_write()}}
-for that.
+not write a file - see \code{\link[=geojson_write]{geojson_write()}} for that.
 
 Note that all sp class objects will output as \code{FeatureCollection} objects,
 while other classes (numeric, list, data.frame) can be output as
@@ -67,13 +75,13 @@ while other classes (numeric, list, data.frame) can be output as
 on allowing \code{GeometryCollection} option for sp class objects.
 
 Also note that with sp classes we do make a round-trip,
-using \code{\link[rgdal:writeOGR]{rgdal::writeOGR()}} to write GeoJSON to disk, then read it back in.
+using \code{\link[sf:st_write]{sf::st_write()}} to write GeoJSON to disk, then read it back in.
 This is fast and we don't have to think
 about it too much, but this disk round-trip is not ideal.
 
 For sf classes (sf, sfc, sfg), the following conversions are made:
 \itemize{
-\item sfg: the appropriate geometry \code{Point, LineString, Polygon, MultiPoint,  MultiLineString, MultiPolygon, GeometryCollection}
+\item sfg: the appropriate geometry \verb{Point, LineString, Polygon, MultiPoint,  MultiLineString, MultiPolygon, GeometryCollection}
 \item sfc: \code{GeometryCollection}, unless the sfc is length 1, then the geometry
 as above
 \item sf: \code{FeatureCollection}

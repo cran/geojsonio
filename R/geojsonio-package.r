@@ -3,7 +3,7 @@
 #' @description Convert various data formats to/from GeoJSON or TopoJSON. This
 #' package focuses mostly on converting lists, data.frame's, numeric,
 #' SpatialPolygons, SpatialPolygonsDataFrame, and more to GeoJSON with the
-#' help of \pkg{rgdal} and friends. You can currently read TopoJSON - writing
+#' help of \pkg{sf}. You can currently read TopoJSON - writing
 #' TopoJSON will come in a future version of this package.
 #'
 #' @section Package organization:
@@ -40,9 +40,8 @@
 #'
 #' @import methods sp rgeos
 #' @importFrom sf st_crs st_transform st_read st_write
-#' @importFrom httr GET POST content stop_for_status upload_file
+#' @importFrom crul HttpClient upload url_parse
 #' @importFrom maptools readShapeSpatial
-#' @importFrom rgdal readOGR writeOGR ogrListLayers
 #' @importFrom magrittr %>%
 #' @importFrom jsonlite toJSON fromJSON unbox
 #' @importFrom geojson featurecollection geometrycollection

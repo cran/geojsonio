@@ -4,9 +4,19 @@
 \alias{map_gist}
 \title{Publish an interactive map as a GitHub gist}
 \usage{
-map_gist(input, lat = "lat", lon = "long", geometry = "point",
-  group = NULL, type = "FeatureCollection", file = "myfile.geojson",
-  description = "", public = TRUE, browse = TRUE, ...)
+map_gist(
+  input,
+  lat = "lat",
+  lon = "long",
+  geometry = "point",
+  group = NULL,
+  type = "FeatureCollection",
+  file = "myfile.geojson",
+  description = "",
+  public = TRUE,
+  browse = TRUE,
+  ...
+)
 }
 \arguments{
 \item{input}{Input object}
@@ -31,7 +41,7 @@ polygons - doesn't apply for points}
 
 \item{browse}{If \code{TRUE} (default) the map opens in your default browser.}
 
-\item{...}{Further arguments passed on to \code{\link[httr:POST]{httr::POST()}}}
+\item{...}{Further arguments passed on to \code{httr::POST}}
 }
 \description{
 There are two ways to authorize to work with your GitHub
@@ -53,6 +63,8 @@ be used.
 }
 \examples{
 \dontrun{
+if (!identical(Sys.getenv("GITHUB_PAT"), "")) {
+
 # From file
 file <- "myfile.geojson"
 geojson_write(us_cities[1:20, ], lat='lat', lon='long', file = file)
@@ -172,5 +184,7 @@ map_gist(r1r2)
 dat <- data.frame(id = c(1,2), value = 3:4)
 r1r2df <- SpatialRingsDataFrame(r1r2, data = dat)
 map_gist(r1r2df)
+
+}
 }
 }

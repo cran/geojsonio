@@ -5,9 +5,17 @@
 \title{Convert many input types with spatial data to geojson specified as a json
 string}
 \usage{
-geojson_json(input, lat = NULL, lon = NULL, group = NULL,
-  geometry = "point", type = "FeatureCollection",
-  convert_wgs84 = FALSE, crs = NULL, ...)
+geojson_json(
+  input,
+  lat = NULL,
+  lon = NULL,
+  group = NULL,
+  geometry = "point",
+  type = "FeatureCollection",
+  convert_wgs84 = FALSE,
+  crs = NULL,
+  ...
+)
 }
 \arguments{
 \item{input}{Input list, data.frame, spatial class, or sf class. Inputs can
@@ -48,7 +56,7 @@ the object already has a CRS.}
 
 \item{...}{Further args passed on to internal functions. For Spatial*
 classes, it is passed through to
-\code{\link[rgdal:writeOGR]{rgdal::writeOGR()}}. For sf classes, data.frames, lists, numerics,
+\code{\link[sf:st_write]{sf::st_write()}}. For sf classes, data.frames, lists, numerics,
 and geo_lists, it is passed through to \code{\link[jsonlite:toJSON]{jsonlite::toJSON()}}}
 }
 \value{
@@ -60,8 +68,7 @@ string
 }
 \details{
 This function creates a geojson structure as a json character
-string; it does not write a file using \pkg{rgdal} - see
-\code{\link[=geojson_write]{geojson_write()}} for that
+string; it does not write a file - see \code{\link[=geojson_write]{geojson_write()}} for that
 
 Note that all sp class objects will output as \code{FeatureCollection}
 objects, while other classes (numeric, list, data.frame) can be output as
@@ -69,13 +76,13 @@ objects, while other classes (numeric, list, data.frame) can be output as
 on allowing \code{GeometryCollection} option for sp class objects.
 
 Also note that with sp classes we do make a round-trip, using
-\code{\link[rgdal:writeOGR]{rgdal::writeOGR()}} to write GeoJSON to disk, then read it back
+\code{\link[sf:st_write]{sf::st_write()}} to write GeoJSON to disk, then read it back
 in. This is fast and we don't have to think about it too much, but this
 disk round-trip is not ideal.
 
 For sf classes (sf, sfc, sfg), the following conversions are made:
 \itemize{
-\item sfg: the appropriate geometry \code{Point, LineString, Polygon,  MultiPoint, MultiLineString, MultiPolygon, GeometryCollection}
+\item sfg: the appropriate geometry \verb{Point, LineString, Polygon,  MultiPoint, MultiLineString, MultiPolygon, GeometryCollection}
 \item sfc: \code{GeometryCollection}, unless the sfc is length 1, then
 the geometry as above
 \item sf: \code{FeatureCollection}
@@ -137,7 +144,7 @@ library("sp")
 library("rgeos")
 pt <- SpatialPoints(coordinates(list(x = 0, y = 0)), CRS("+proj=longlat +datum=WGS84"))
 ## transfrom to web mercator becuase geos needs project coords
-crs <- gsub("\\n", "", paste0("+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0
+crs <- gsub("\n", "", paste0("+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0
    +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs", collapse = ""))
 pt <- spTransform(pt, CRS(crs))
 ## buffer
