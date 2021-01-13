@@ -1,11 +1,9 @@
+skip_on_cran()
+
 context("projections")
 
 test_that("projections works with different projection names", {
-  skip_on_cran()
-
-  aa <-
-  bb <- projections("orthographic")
-
+  
   expect_is(projections("albers"), "character")
   expect_is(projections("orthographic"), "character")
   expect_is(projections("conicEqualArea"), "character")

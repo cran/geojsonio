@@ -36,7 +36,7 @@ polygons - doesn't apply for points}
 (default) or GeometryCollection.}
 
 \item{convert_wgs84}{Should the input be converted to the
-\href{https://tools.ietf.org/html/rfc7946}{standard CRS for GeoJSON}
+standard CRS for GeoJSON (https://tools.ietf.org/html/rfc7946)
 (geographic coordinate reference system, using the WGS84 datum, with
 longitude and latitude units of decimal degrees; EPSG: 4326).
 Default is \code{FALSE} though this may change in a future package version.
@@ -49,11 +49,9 @@ be an epsg code as a four or five digit integer or a valid proj4 string.
 This argument will be ignored if \code{convert_wgs84} is \code{FALSE}
 or the object already has a CRS.}
 
-\item{precision}{(integer) desired number of decimal places for the
-coordinates in the
-geojson file. Only used with classes from \pkg{sp}\pkg{rgeos} classes;
-ignored for other classes. Using fewer decimal places can decrease file
-sizes (at the
+\item{precision}{(integer) desired number of decimal places for coordinates.
+Only used with classes from \pkg{sp}\pkg{rgeos} classes; ignored for other
+classes. Using fewer decimal places decreases object sizes (at the
 cost of precision). This changes the underlying precision stored in the
 data. \verb{options(digits = <some number>)} changes the maximum number of
 digits displayed (to find out what yours is set at see

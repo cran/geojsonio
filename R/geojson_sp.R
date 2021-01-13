@@ -4,7 +4,7 @@
 #'
 #' @inheritParams geojson_sf
 #' @param disambiguateFIDs Ignored, and will be removed in a future version. 
-#' Previously was passed to [rgdal::readOGR()], which is no longer used.
+#' Previously was passed to `rgdal::readOGR()`, which is no longer used.
 #'
 #' @return A spatial class object, see Details.
 #' @details The spatial class object returned will depend on the input GeoJSON.
@@ -96,8 +96,4 @@ tosp_base <- function(x, stringsAsFactors, ...) {
 
 tosp <- function(x, stringsAsFactors, ...) {
   as(tosp_base(x, stringsAsFactors, ...), "Spatial")
-}
-
-tosp_list <- function(x, stringsAsFactors = FALSE, parse = FALSE, ...) {
-  sf2list(tosp_base(x, stringsAsFactors, ...), parse)
 }

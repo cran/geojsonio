@@ -22,7 +22,7 @@
 #' geojson file. Using fewer decimal places can decrease file sizes (at the
 #' cost of precision).
 #' @param convert_wgs84 Should the input be converted to the 
-#' [standard CRS for GeoJSON](https://tools.ietf.org/html/rfc7946)
+#' standard CRS for GeoJSON (https://tools.ietf.org/html/rfc7946)
 #' (geographic coordinate reference 
 #' system, using the WGS84 datum, with longitude and latitude units of decimal 
 #' degrees; EPSG: 4326). Default is `FALSE` though this may change in a 
@@ -419,11 +419,14 @@ geojson_write.geo_list <- function(input, lat = NULL, lon = NULL, geometry = "po
 
 #' @export
 geojson_write.json <- function(input, lat = NULL, lon = NULL, geometry = "point",
-                               group = NULL, file = "myfile.geojson", overwrite = TRUE, ...) {
+                               group = NULL, file = "myfile.geojson", overwrite = TRUE,
+                               precision = NULL, ...) {
   if (!overwrite && file.exists(file)) {
     stop(file, " already exists and overwrite = FALSE", call. = FALSE)
   }
-  cat(toJSON(jsonlite::fromJSON(input), auto_unbox = TRUE, ...), file = file)
+  if (is.null(precision)) precision <- 4
+  cat(toJSON(jsonlite::fromJSON(input), auto_unbox = TRUE, digits = precision, ...),
+    file = file)
   message("Success! File is at ", file)
   return(geo_file(file, "json"))
 }

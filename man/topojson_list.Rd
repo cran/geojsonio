@@ -38,7 +38,7 @@ polygons - doesn't apply for points}
 (default) or GeometryCollection.}
 
 \item{convert_wgs84}{Should the input be converted to the
-\href{https://tools.ietf.org/html/rfc7946}{standard CRS for GeoJSON}
+standard CRS for GeoJSON (https://tools.ietf.org/html/rfc7946)
 (geographic coordinate reference system, using the WGS84 datum, with
 longitude and latitude units of decimal degrees; EPSG: 4326).
 Default is \code{FALSE} though this may change in a future package version.
@@ -208,7 +208,7 @@ if (require(sf)) {
 ## sfg (a single simple features geometry)
   p1 <- rbind(c(0,0), c(1,0), c(3,2), c(2,4), c(1,4), c(0,0))
   poly <- rbind(c(1,1), c(1,2), c(2,2), c(1,1))
-  poly_sfg <-st_polygon(list(p1))
+  poly_sfg <- st_polygon(list(p1))
   topojson_list(poly_sfg)
 
 ## sfc (a collection of geometries)
