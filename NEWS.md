@@ -1,3 +1,7 @@
+# geojsonio 0.11.1
+
+* Removed references to geojsonlint as that package nears retirement.
+
 # geojsonio 0.11.0
 
 ## Breaking changes
