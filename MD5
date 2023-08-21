@@ -1,7 +1,7 @@
-3a0bd212b16c7f6f326f3dada546313d *DESCRIPTION
+d0684d9dabda355bf8d838984cda5b62 *DESCRIPTION
 63ac33112dccb2546e5422ec6f3ed6c5 *LICENSE
 cde1a0cbabfbb3071e0533e5154cd0f7 *NAMESPACE
-171bc8603376e6ff349a47833aa0be13 *NEWS.md
+c6022bce9b1ea326fbaacc11b2da16f5 *NEWS.md
 e9f6a79a8dd20196fe87d0de2ce60f4e *R/as.json.R
 04f36bfea077ed4c7aa63db8b8fde1ae *R/as.location.R
 d1f49a51d1d773c815049bc8ddacdcd2 *R/as_spatial_methods.R
@@ -20,7 +20,7 @@ b5ddc2beebc952e2b7dceb3be5c8602d *R/geojson_atomize.R
 324ae8864030c6d006039601fcdf10c9 *R/geojson_sp.R
 4c431fe6fd4c1fbd41adcf9f226b9cc4 *R/geojson_style.R
 20741469df54260f92b9e750c1c4b9e7 *R/geojson_write.r
-c2b58bad1a10370f155046d149bab9be *R/geojsonio-package.r
+1582610ce177c1368b0f6cb144db0acc *R/geojsonio-package.r
 1431d49fb9951f357f4dff0013b4329a *R/globals.r
 f74e66a3acb739889ed299c0eb3c210f *R/mapgist.R
 604bc746b8fb069937945f415e1770a7 *R/mapleaflet.R
@@ -74,7 +74,7 @@ d5d90d5c1aca1782d8ae56c4e19c76ff *man/geojson_sf.Rd
 4fb4f2f0bd626d027460c2cf0bd85a35 *man/geojson_sp.Rd
 0d563286bc5197390f36c8ac1129c090 *man/geojson_style.Rd
 7ac6768a00597a699bdfb44a44fa9ad1 *man/geojson_write.Rd
-b50e97f169dc8d2d3c84ca071e3b31ad *man/geojsonio.Rd
+7a23e426ae72b9cb5316f299cdca6d76 *man/geojsonio.Rd
 795fa855ae7c72f0bd7adf615551ed3b *man/map_gist.Rd
 26cd532fad93dd985beeb576efd1db0c *man/map_leaf.Rd
 e17f41e959fd90a1736ad0fc8ee7ff81 *man/pipe.Rd

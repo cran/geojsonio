@@ -1,3 +1,9 @@
+# geojsonio 0.11.2
+
+* This is a tiny patch release with no user-facing changes.
+
+* Added `\alias{geojsonio-package}` to `man/geojsonio.rd`.
+
 # geojsonio 0.11.1
 
 * Removed references to geojsonlint as that package nears retirement.
