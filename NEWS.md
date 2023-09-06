@@ -1,3 +1,9 @@
+# geojsonio 0.11.3
+
+* Removed an unused V8 call to geojsonhint
+
+* Removed all remaining references to rgeos
+
 # geojsonio 0.11.2
 
 * This is a tiny patch release with no user-facing changes.

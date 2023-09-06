@@ -14,7 +14,7 @@
 #' @param group (character) A grouping variable to perform grouping for
 #' polygons - doesn't apply for points
 #' @param precision (integer) desired number of decimal places for coordinates.
-#' Only used with classes from \pkg{sp}\pkg{rgeos} classes; ignored for other
+#' Only used with classes from \pkg{sp} classes; ignored for other
 #' classes. Using fewer decimal places decreases object sizes (at the
 #' cost of precision). This changes the underlying precision stored in the
 #' data. `options(digits = <some number>)` changes the maximum number of
@@ -190,18 +190,6 @@
 #' sgdf <- SpatialGridDataFrame(sg, data.frame(val = 1:12))
 #' geojson_list(sgdf)
 #'
-#' # From SpatialRings
-#' library("rgeos")
-#' r1 <- Ring(cbind(x = c(1, 1, 2, 2, 1), y = c(1, 2, 2, 1, 1)), ID = "1")
-#' r2 <- Ring(cbind(x = c(1, 1, 2, 2, 1), y = c(1, 2, 2, 1, 1)), ID = "2")
-#' r1r2 <- SpatialRings(list(r1, r2))
-#' geojson_list(r1r2)
-#'
-#' # From SpatialRingsDataFrame
-#' dat <- data.frame(id = c(1, 2), value = 3:4)
-#' r1r2df <- SpatialRingsDataFrame(r1r2, data = dat)
-#' geojson_list(r1r2df)
-#'
 #' # From SpatialPixels
 #' library("sp")
 #' pixels <- suppressWarnings(
@@ -219,22 +207,6 @@
 #'   )
 #' )
 #' geojson_list(pixelsdf)
-#'
-#' # From SpatialCollections
-#' library("sp")
-#' poly1 <- Polygons(
-#'   list(Polygon(cbind(c(-100, -90, -85, -100), c(40, 50, 45, 40)))), "1"
-#' )
-#' poly2 <- Polygons(
-#'   list(Polygon(cbind(c(-90, -80, -75, -90), c(30, 40, 35, 30)))), "2"
-#' )
-#' poly <- SpatialPolygons(list(poly1, poly2), 1:2)
-#' coordinates(us_cities) <- ~ long + lat
-#' dat <- SpatialCollections(points = us_cities, polygons = poly)
-#' out <- geojson_list(dat)
-#' out$SpatialPoints
-#' out$SpatialPolygons
-#' }
 #'
 #' # From sf classes:
 #' if (require(sf)) {
@@ -256,6 +228,7 @@
 #'   poly_sfc <- st_sfc(st_polygon(list(p1)), st_polygon(list(p2)))
 #'   poly_sf <- st_sf(foo = c("a", "b"), bar = 1:2, poly_sfc)
 #'   geojson_list(poly_sf)
+#' }
 #' }
 #'
 geojson_list <- function(input, lat = NULL, lon = NULL, group = NULL,
@@ -364,58 +337,6 @@ geojson_list.SpatialPixelsDataFrame <- function(input, lat = NULL, lon = NULL,
     target = "list", precision = precision,
     convert_wgs84 = convert_wgs84, crs = crs
   ), "SpatialPixelsDataFrame")
-}
-
-# spatial classes from rgeos --------------------------
-#' @export
-geojson_list.SpatialRings <- function(input, lat = NULL, lon = NULL,
-                                      group = NULL, geometry = "point", type = "FeatureCollection",
-                                      convert_wgs84 = FALSE, crs = NULL, precision = NULL, ...) {
-  as.geo_list(geojson_rw(input,
-    target = "list", precision = precision,
-    convert_wgs84 = convert_wgs84, crs = crs
-  ), "SpatialRings")
-}
-
-#' @export
-geojson_list.SpatialRingsDataFrame <- function(input, lat = NULL, lon = NULL,
-                                               group = NULL, geometry = "point", type = "FeatureCollection",
-                                               convert_wgs84 = FALSE, crs = NULL, precision = NULL, ...) {
-  as.geo_list(geojson_rw(input,
-    target = "list", precision = precision,
-    convert_wgs84 = convert_wgs84, crs = crs
-  ), "SpatialRingsDataFrame")
-}
-
-#' @export
-geojson_list.SpatialCollections <- function(input, lat = NULL, lon = NULL,
-                                            group = NULL, geometry = "point", type = "FeatureCollection",
-                                            convert_wgs84 = FALSE, crs = NULL, precision = NULL, ...) {
-  pt <- donotnull(input@pointobj, geojson_rw,
-    target = "list",
-    convert_wgs84 = convert_wgs84, crs = crs,
-    precision = precision
-  )
-  ln <- donotnull(input@lineobj, geojson_rw,
-    target = "list",
-    convert_wgs84 = convert_wgs84, crs = crs,
-    precision = precision
-  )
-  rg <- donotnull(input@ringobj, geojson_rw,
-    target = "list",
-    convert_wgs84 = convert_wgs84, crs = crs,
-    precision = precision
-  )
-  py <- donotnull(input@polyobj, geojson_rw,
-    target = "list",
-    convert_wgs84 = convert_wgs84, crs = crs,
-    precision = precision
-  )
-  alldat <- tg_compact(list(
-    SpatialPoints = pt, SpatialLines = ln,
-    SpatialRings = rg, SpatialPolygons = py
-  ))
-  as.geo_list(alldat, "SpatialCollections")
 }
 
 donotnull <- function(x, fun, ...) {
